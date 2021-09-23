@@ -1,0 +1,23 @@
+{
+  "name": "cypressauto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/cypress run",
+    "open": "node_modules/.bin/cypress open",
+    "headTest": "npm run test -- --header",
+    "chromeTest": "npm run test -- --browser chrome --parallel",
+    "recordDashboardTest": "npm run test -- --record --key 73c5af84-d89e-4477-bc37-6740640d39d4"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^8.4.1",
+    "cypress-cucumber-preprocessor": "^1.7.0"
+  },
+  "dependencies": {
+    "dayjs": "^1.10.6",
+    "moment": "^2.29.1"
+  }
+}
