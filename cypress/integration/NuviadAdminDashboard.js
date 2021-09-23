@@ -166,7 +166,7 @@ describe('Test pending ads table',function(){
         cy.get('.btn-primary').click()
     })
 }) */
-describe('Test pending accounts table',function(){
+/* describe('Test pending accounts table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -287,9 +287,9 @@ describe('Test pending accounts table',function(){
     it('Views today sorting',function(){
         accountsSorting(7,`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=views_today`,`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=-views_today`)
     })
-})
+}) */
 
-describe('Test transactions table',function(){
+/* describe('Test transactions table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -355,8 +355,50 @@ describe('Test transactions table',function(){
     it('Currency sorting',function(){
         transactionsSorting(6,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=mc_currency`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-mc_currency`)
     })
-})
+}) */
 
+describe('Credit requests',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function creditSorting(col,apiUp,apiDown){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get(`#nuviad-credit-request-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
+        cy.wait(3000)
+        cy.checkApiLoad(apiUp,Authorization)
+        cy.get(`#nuviad-credit-request-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
+        cy.wait(3000)
+        cy.checkApiLoad(apiDown,Authorization)
+    }
+    it('Account sorting',function(){
+        creditSorting(1,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=account_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-account_id&status=PENDING`)
+    })
+    it('Created at sorting',function(){
+        creditSorting(3,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=created_at&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`)
+    })
+    it('Updated at sorting',function(){
+        creditSorting(4,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=updated_at&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-updated_at&status=PENDING`)
+    })
+    it('Amount sorting',function(){
+        creditSorting(5,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=amount&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-amount&status=PENDING`)
+    })
+    it('Currency sorting',function(){
+        creditSorting(6,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=currency&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-currency&status=PENDING`)
+    })
+    it('Notes sorting',function(){
+        creditSorting(7,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=notes&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-notes&status=PENDING`)
+    })
+    it('ID sorting',function(){
+        creditSorting(8,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-_id&status=PENDING`)
+    })
+    it('Requester sorting',function(){
+        creditSorting(9,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=requester_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-requester_id&status=PENDING`)
+    })
+})
 /* describe('Charts testing',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
