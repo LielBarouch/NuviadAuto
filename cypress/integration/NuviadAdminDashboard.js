@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
-
-
+let initCredit=0
+let creditToComp=0
 
 describe('Login Admin dashboard', function () {
     beforeEach(function () {
@@ -36,7 +36,7 @@ describe('Login Admin dashboard', function () {
 
     })
 })
-/* describe('Stats and APIs tests',function(){
+describe('Stats and APIs tests',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -59,7 +59,7 @@ describe('Login Admin dashboard', function () {
     it('Check stats and charts APIs', function () {
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/ads/?limit=1000&status=PENDING_VERIFICATION`, Authorization)
+        /* cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/ads/?limit=1000&status=PENDING_VERIFICATION`, Authorization) */
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/daily/summary`, Authorization)
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/daily`, Authorization)
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/minute`, Authorization)
@@ -103,7 +103,7 @@ describe('Login Admin dashboard', function () {
     })
     
 })
-describe('Test pending ads table',function(){
+/* describe('Test pending ads table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -166,7 +166,7 @@ describe('Test pending ads table',function(){
         cy.get('.btn-primary').click()
     })
 }) */
-/* describe('Test pending accounts table',function(){
+describe('Test pending accounts table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -287,9 +287,9 @@ describe('Test pending ads table',function(){
     it('Views today sorting',function(){
         accountsSorting(7,`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=views_today`,`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=-views_today`)
     })
-}) */
+})
 
-/* describe('Test transactions table',function(){
+describe('Test transactions table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -355,7 +355,7 @@ describe('Test pending ads table',function(){
     it('Currency sorting',function(){
         transactionsSorting(6,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=mc_currency`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-mc_currency`)
     })
-}) */
+})
 
 describe('Credit requests',function(){
     beforeEach(function () {
@@ -373,6 +373,19 @@ describe('Credit requests',function(){
         cy.get(`#nuviad-credit-request-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
         cy.wait(3000)
         cy.checkApiLoad(apiDown,Authorization)
+    }
+    function getCreditApi(urlToTest){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
     }
     it('Account sorting',function(){
         creditSorting(1,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=account_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-account_id&status=PENDING`)
@@ -397,6 +410,198 @@ describe('Credit requests',function(){
     })
     it('Requester sorting',function(){
         creditSorting(9,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=requester_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-requester_id&status=PENDING`)
+    })
+    it('Refresh table',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('.align-items-center > .d-flex > :nth-child(2) > .sc-bdVaJa').click
+        cy.wait(4000)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`,Authorization)
+    })
+    it('View all requests',function(){
+        cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('#react-select-7-option-0').click()
+        cy.wait(3000)
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at`)).then(response=>{
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
+        })
+    })
+    it('View approved requests',function(){
+        cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.get('#react-select-7-option-2').click()
+        cy.wait(3000)
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=APPROVED`)).then(response=>{
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
+            for(let i=0;i<response.body.rows.lenght;i++){
+                cy.wrap(response.body.rows[i].status).should('eq','APPROVED')
+            }
+        })
+    })
+    it('View rejected requests',function(){
+        cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.get('#react-select-7-option-3').click()
+        cy.wait(3000)
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=REJECTED`)).then(response=>{
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
+            for(let i=0;i<response.body.rows.lenght;i++){
+                cy.wrap(response.body.rows[i].status).should('eq','REJECTED')
+            }
+        })
+    })
+    it('View pending requests',function(){
+        cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.get('#react-select-7-option-1').click()
+        cy.wait(3000)
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`)).then(response=>{
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
+            for(let i=0;i<response.body.rows.lenght;i++){
+                cy.wrap(response.body.rows[i].status).should('eq','PENDING')
+            }
+        })
+    })
+})
+describe('Test credit request approving process',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    it('Login to dashboard',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+    })
+    it('Login',function(){
+        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
+        cy.get('.btn').click() 
+        cy.wait(6000)
+    })
+    it('Get the credit amount of the user',function(){
+        cy.getToken("sivangrisario@gmail.com", "sivan")
+        cy.get('h3').eq(0).then(($el)=>{
+            let spending=$el.text()
+            initCredit=Number(spending.replace(/\$|,/g, ''))
+        })
+    })
+    it('Enter to the admin dashboard login', function () {
+        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+    })
+    it('Login', function () {
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+        cy.log(initCredit)
+    })
+    it('Create credit request',function(){
+        cy.get('#nuviad-credit-request-card > .align-items-center > .d-flex > :nth-child(1) > .sc-bdVaJa').click()
+        cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.form-group > .css-2b097c-container').type('Patternz')
+        cy.get('.css-11unzgr').contains('Patternz (sivangrisario@gmail.com)').click()
+        cy.get('#amount').clear()
+        cy.get('#amount').type(1000)
+        cy.get('#notes').type('Automation test')
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        creditToComp=initCredit+1000
+    })
+    it('Approve request',function(){
+        cy.get(':nth-child(1) > :nth-child(10) > .btn-group > :nth-child(1) > svg').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(3000)
+    })
+    it('Login to dashboard',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+    })
+    it('Login',function(){
+        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
+        cy.get('.btn').click() 
+        cy.wait(6000)
+    })
+    it('Check credit change for the user',function(){
+        cy.getToken("sivangrisario@gmail.com", "sivan")
+        cy.get('h3').eq(0).then(($el)=>{
+            let credit=$el.text()
+            credit=Number(credit.replace(/\$|,/g, ''))
+            cy.wrap(credit).should('eq',creditToComp)
+        })
+    })
+})
+
+describe('Test credit request rejecting process',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    it('Login to dashboard',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+    })
+    it('Login',function(){
+        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
+        cy.get('.btn').click() 
+        cy.wait(6000)
+    })
+    it('Get the credit amount of the user',function(){
+        cy.getToken("sivangrisario@gmail.com", "sivan")
+        cy.get('h3').eq(0).then(($el)=>{
+            let credit=$el.text()
+            initCredit=Number(credit.replace(/\$|,/g, ''))
+        })
+    })
+    it('Enter to the admin dashboard login', function () {
+        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+    })
+    it('Login', function () {
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+        cy.log(initCredit)
+    })
+    it('Create credit request',function(){
+        cy.get('#nuviad-credit-request-card > .align-items-center > .d-flex > :nth-child(1) > .sc-bdVaJa').click()
+        cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.form-group > .css-2b097c-container').type('Patternz')
+        cy.get('.css-11unzgr').contains('Patternz (sivangrisario@gmail.com)').click()
+        cy.get('#amount').clear()
+        cy.get('#amount').type(1000)
+        cy.get('#notes').type('Automation test')
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        
+    })
+    it('Reject request',function(){
+        cy.get(':nth-child(1) > :nth-child(10) > .btn-group > :nth-child(2) > svg').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(3000)
+    })
+    it('Login to dashboard',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+    })
+    it('Login',function(){
+        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
+        cy.get('.btn').click() 
+        cy.wait(6000)
+    })
+    it('Check credit change for the user',function(){
+        cy.getToken("sivangrisario@gmail.com", "sivan")
+        cy.get('h3').eq(0).then(($el)=>{
+            let credit=$el.text()
+            credit=Number(credit.replace(/\$|,/g, ''))
+            cy.wrap(credit).should('eq',initCredit)
+        })
+    })
+    it('Enter to the admin dashboard login', function () {
+        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+    })
+    it('Login', function () {
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+        cy.log(initCredit)
     })
 })
 /* describe('Charts testing',function(){
