@@ -357,7 +357,7 @@ describe('Login Admin dashboard', function () {
     })
 }) */
 
-describe('Credit requests',function(){
+/* describe('Credit requests',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -459,8 +459,8 @@ describe('Credit requests',function(){
             }
         })
     })
-})
-describe('Test credit request approving process',function(){
+}) */
+/* describe('Test credit request approving process',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -525,9 +525,9 @@ describe('Test credit request approving process',function(){
             cy.wrap(credit).should('eq',creditToComp)
         })
     })
-})
+}) */
 
-describe('Test credit request rejecting process',function(){
+/* describe('Test credit request rejecting process',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -603,25 +603,95 @@ describe('Test credit request rejecting process',function(){
         cy.wait(10000)
         cy.log(initCredit)
     })
-})
-/* describe('Charts testing',function(){
+}) */
+
+describe('Charts',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    it('Test actors name in wins chart',function(){
-        cy.get('.recharts-wrapper').eq(1) 
+    function getMinApi(urlToTest){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+    it('Check actors names in Wins per minutes chart',function(){
+        cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.wait(5000)
+        cy.get('#nuviad-per-minute-card-wins > .card-body > :nth-child(2) > .recharts-responsive-container > .recharts-wrapper > .recharts-legend-wrapper > .recharts-default-legend>.recharts-legend-item>.recharts-legend-item-text').as('actorsInChart')
+        let compCount=0
+        let actorsArr=[]
+        cy.get('@actorsInChart').then($el=>{
+            let actorsLenght=$el.length
+            for(let i=0;i<actorsLenght;i++){
+                actorsArr[i]=$el.eq(i).text()
+            }
+            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+                for(let i=0;i<actorsLenght;i++){
+                    for(let j=0;j<actorsLenght;j++){
+                        if(actorsArr[i]==response.body.related_entities.accounts[j].name){
+                            compCount++
+                        }
+                    }
+                }
+                cy.wrap(compCount).should('eq',actorsLenght)
+            })
+        })
     })
-}) */
-    /* it('Test wins chart hours change',function(){
-        cy.get(':nth-child(3) > :nth-child(2) > .mg-b-10 > .card-body > .p-2 > .col-xl-4 > .css-2b097c-container > .css-yk16xz-control').click({force:true})
-        cy.get('.css-11unzgr')
+    it('Check actors names in Clicks per minutes chart',function(){
+        cy.get('#nuviad-per-minute-card-clicks > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.wait(5000)
+        cy.get('#nuviad-per-minute-card-clicks > .card-body > :nth-child(2) > .recharts-responsive-container > .recharts-wrapper > .recharts-legend-wrapper > .recharts-default-legend>.recharts-legend-item>.recharts-legend-item-text').as('actorsInChart')
+        let compCount=0
+        let actorsArr=[]
+        cy.get('@actorsInChart').then($el=>{
+            let actorsLenght=$el.length
+            for(let i=0;i<actorsLenght;i++){
+                actorsArr[i]=$el.eq(i).text()
+            }
+            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+                for(let i=0;i<actorsLenght;i++){
+                    for(let j=0;j<actorsLenght;j++){
+                        if(actorsArr[i]==response.body.related_entities.accounts[j].name){
+                            compCount++
+                        }
+                    }
+                }
+                cy.wrap(compCount).should('eq',actorsLenght)
+            })
+        })
     })
-
-    it('Total stats defferent dates test',function(){
-        cy.get('.react-datepicker__input-container > .lh-0 > svg').click()
-        
-    }) */
-    
+    it('Check actors names in Spend per minutes chart',function(){
+        cy.get('#nuviad-per-minute-card-spend > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.wait(5000)
+        cy.get('#nuviad-per-minute-card-spend > .card-body > :nth-child(2) > .recharts-responsive-container > .recharts-wrapper > .recharts-legend-wrapper > .recharts-default-legend>.recharts-legend-item>.recharts-legend-item-text').as('actorsInChart')
+        let compCount=0
+        let actorsArr=[]
+        cy.get('@actorsInChart').then($el=>{
+            let actorsLenght=$el.length
+            for(let i=0;i<actorsLenght;i++){
+                actorsArr[i]=$el.eq(i).text()
+            }
+            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+                for(let i=0;i<actorsLenght;i++){
+                    for(let j=0;j<actorsLenght;j++){
+                        if(actorsArr[i]==response.body.related_entities.accounts[j].name){
+                            compCount++
+                        }
+                    }
+                }
+                cy.wrap(compCount).should('eq',actorsLenght)
+            })
+        })
+    })
+})
