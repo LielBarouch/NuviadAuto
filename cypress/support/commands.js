@@ -104,7 +104,7 @@ Cypress.Commands.add('selectTableRows',(selection,selectionToCompair,tableNum,ta
         if(selectionToCompair==100){
             cy.wrap(rows.length).should('gt',50)
         }else{
-            cy.wrap(rows.length).should('eq',selectionToCompair)
+            cy.wrap(rows.length).should('be.lte',selectionToCompair)
         }
         
     })
