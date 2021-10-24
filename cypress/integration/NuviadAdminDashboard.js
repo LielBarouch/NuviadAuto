@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
-let initCredit=0
-let creditToComp=0
+let initCredit = 0
+let creditToComp = 0
+const dayjs = require('dayjs')
 
 describe('Login Admin dashboard', function () {
     beforeEach(function () {
@@ -36,7 +37,7 @@ describe('Login Admin dashboard', function () {
 
     }) */
 })
-describe('Stats and APIs tests',function(){
+/* describe('Stats and APIs tests',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -103,7 +104,7 @@ describe('Stats and APIs tests',function(){
         })
     })
     
-})
+}) */
 /* describe('Test pending ads table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -425,7 +426,7 @@ describe('Stats and APIs tests',function(){
     })
 }) */
 
-describe('Credit requests',function(){
+/* describe('Credit requests',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -671,7 +672,7 @@ describe('Test credit request rejecting process',function(){
         cy.wait(10000)
         cy.log(initCredit)
     })
-})
+}) */
 
 /* describe('Charts',function(){
     beforeEach(function () {
@@ -766,14 +767,14 @@ describe('Test credit request rejecting process',function(){
     })
 }) */
 
-describe('Daily actor spend',function(){
+describe('Daily actor spend', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function getActorSpendAPI(urlToTest){
+    function getActorSpendAPI(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -786,28 +787,111 @@ describe('Daily actor spend',function(){
         }
         return apiToTest
     }
-    function actorSpendSorting(col,apiUp,apiDown){
+    function actorSpendSorting(col, apiUp, apiDown) {
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get(`#nuviad-daily-actor-spend-card > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
         cy.wait(3000)
-        cy.checkApiLoad(apiUp,Authorization)
+        cy.checkApiLoad(apiUp, Authorization)
         cy.get(`#nuviad-daily-actor-spend-card > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
         cy.wait(3000)
-        cy.checkApiLoad(apiDown,Authorization)
+        cy.checkApiLoad(apiDown, Authorization)
     }
-    it('Test daily actor spend table',function(){
-        cy.get('#nuviad-daily-actor-spend-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click({force:true})
+    it('Test daily actor spend table', function () {
+        cy.get('#nuviad-daily-actor-spend-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click({ force: true })
         cy.wait(5000)
-        cy.request(getActorSpendAPI(`${this.data.API_BASE_URL}/admin/stats/accounts/daily/summary`)).then(response=>{
-            const actorsCount=response.body.rows.length
-            cy.get('#nuviad-daily-actor-spend-table > .dataTables_wrapper > .dataTables_info').should('contain.text',actorsCount+" entries")
+        cy.request(getActorSpendAPI(`${this.data.API_BASE_URL}/admin/stats/accounts/daily/summary`)).then(response => {
+            const actorsCount = response.body.rows.length
+            cy.get('#nuviad-daily-actor-spend-table > .dataTables_wrapper > .dataTables_info').should('contain.text', actorsCount + " entries")
         })
     })
-    it('Table rows display test',function(){
-        cy.selectTableRows('25',25,4,'#nuviad-daily-actor-spend-card')
-        cy.selectTableRows('50',50,4,'#nuviad-daily-actor-spend-card')
-        cy.selectTableRows('100',100,4,'#nuviad-daily-actor-spend-card')
-        cy.selectTableRows('10',10,4,'#nuviad-daily-actor-spend-card')
+     it('Table rows display test',function(){
+         cy.selectTableRows('25',25,4,'#nuviad-daily-actor-spend-card')
+         cy.selectTableRows('50',50,4,'#nuviad-daily-actor-spend-card')
+         /* cy.selectTableRows('100',100,4,'#nuviad-daily-actor-spend-card') */
+         cy.selectTableRows('10',10,4,'#nuviad-daily-actor-spend-card')
+     })
+
+    it('Test date change', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-daily-actor-spend-card > .pt-3 > :nth-child(1) > .col-lg-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        let currentDate = dayjs()
+        let yesterday=currentDate.subtract(1,'days')
+        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/accounts/daily/summary?date=${yesterday.format('YYYY-MM-DD')}`,Authorization)
     })
 })
+
+/* describe('Allowed features',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    it('Switch to active accounts view', function () {
+        cy.get('#nuviad-accounts-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.get('#react-select-6-option-2').click()
+        
+    })
+    it('Search for a testing account',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('TestUser')
+        cy.wait(3000)
+    })
+    it('Open the allowed features modal',function(){
+        cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
+    })
+    it('Allow Use JS tags & Vast tags',function(){
+        cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('#react-select-8-option-1').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-8-option-2').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(20000)
+    })
+    it('Check if allowed',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+        cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
+        cy.get('.btn').click() 
+        cy.wait(6000)
+        cy.get(':nth-child(4) > a').click()
+        cy.get('#upload-ads-button').click()
+        cy.get('.uib-dropdown-menu > :nth-child(4) > .ng-scope').should('be.visible')
+        cy.get('.uib-dropdown-menu > :nth-child(5) > .ng-scope').should('be.visible')
+    })
+    it('Login again to admin dashboard',function(){
+        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+    })
+    it('Switch to active accounts view', function () {
+        cy.get('#nuviad-accounts-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.get('#react-select-6-option-2').click()
+        
+    })
+    it('Search for a testing account',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('TestUser')
+        cy.wait(3000)
+    })
+    it('Open the allowed features modal',function(){
+        cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
+    })
+    it('Disable Use JS tags & Vast tags',function(){
+        cy.get(':nth-child(1) > .css-19bqh2r').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(20000)
+    })
+    it('Check if allowed',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+        cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
+        cy.get('.btn').click() 
+        cy.wait(6000)
+        cy.get(':nth-child(4) > a').click()
+        cy.get('#upload-ads-button').click()
+        cy.get('.uib-dropdown-menu > :nth-child(4) > .ng-scope').should('not.be.visible')
+        cy.get('.uib-dropdown-menu > :nth-child(5) > .ng-scope').should('not.be.visible')
+    })
+}) */
