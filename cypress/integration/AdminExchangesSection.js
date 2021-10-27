@@ -33,7 +33,7 @@ const dayjs = require('dayjs')
     })
 }) */
 
-describe('Login to admin dashboard',function(){
+describe('Login to admin dashboard', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -53,35 +53,35 @@ describe('Login to admin dashboard',function(){
     })
 })
 
-describe('Exchanges section',function(){
+describe('Exchanges section', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    it('Enter Exchanges section',function(){
+    it('Enter Exchanges section', function () {
         cy.get('.with-sub > .nav-link').click()
         cy.get(':nth-child(3) > .nav-sub-link').click()
         cy.wait(3000)
-        
+
     })
-    it('Check the url and API load',function(){
-        cy.url().should('eq','https://admin-stg.nuviad.com/dashboard/exchanges')
+    it('Check the url and API load', function () {
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/exchanges')
         const token = Cypress.env('token');
         const Authorization = token;
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name`, Authorization)
     })
 })
 
-describe('Table tests',function(){
+describe('Table tests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function getExchangesApi(urlToTest){
+    function getExchangesApi(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -94,28 +94,64 @@ describe('Table tests',function(){
         }
         return apiToTest
     }
-    it('Test table refreshing',function(){
+    function tableSort(col, apiUp, apiDown) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get(`table>thead>tr> :nth-child(${col})`).click()
+        cy.wait(3000)
+        cy.checkApiLoad(apiUp, Authorization)
+        cy.get(`table>thead>tr> :nth-child(${col})`).click()
+        cy.wait(3000)
+        cy.checkApiLoad(apiDown, Authorization)
+    }
+
+    function rowsLimitSelect(selection,selectionToCompair,table) {
+        cy.get('select').select(selection)
+        cy.wait(3000)
+        cy.get(table).find('tbody>tr').then((rows) => {
+            if (selectionToCompair == 100) {
+                cy.wrap(rows.length).should('gt', 50)
+            } else {
+                cy.wrap(rows.length).should('be.lte', selectionToCompair)
+            }
+
+        })
+    }
+
+    it('Test table refreshing', function () {
         cy.get(':nth-child(2) > .sc-bdVaJa').click()
         cy.wait(3000)
         const token = Cypress.env('token');
         const Authorization = token;
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name`, Authorization)
     })
-    it('Test search',function(){
-        const searchWord='test1'
+    it('Test search', function () {
+        const searchWord = 'test1'
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get('input').type(searchWord)
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name&q=test1`, Authorization)
-        cy.request(getExchangesApi(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name&q=test1`)).then(response=>{
-            cy.get('.dataTables_info').should('contain.text',response.body.total_count+" entries")
-            for(let i=1;i<=response.body.total_count;i++){
-                cy.get(`:nth-child(${i}) > .sorting_1`).then($el=>{
-                    let exName=$el.text()
-                    exName=exName.toLowerCase()
+        cy.request(getExchangesApi(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name&q=test1`)).then(response => {
+            cy.get('.dataTables_info').should('contain.text', response.body.total_count + " entries")
+            for (let i = 1; i <= response.body.total_count; i++) {
+                cy.get(`:nth-child(${i}) > .sorting_1`).then($el => {
+                    let exName = $el.text()
+                    exName = exName.toLowerCase()
                     expect(exName).to.contain(searchWord)
                 })
             }
         })
+        cy.get('input').clear()
+        cy.wait(3000)
+    })
+    it('Table sorting test', function () {
+        tableSort(1, `${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=name`, `${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name`)
+        tableSort(2, `${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=id`, `${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-id`)
+    })
+    it('Table rows display test', function () {
+        rowsLimitSelect('25', 25,  '#nuviad-exchanges-card')
+        rowsLimitSelect('50', 50,  '#nuviad-exchanges-card')
+        rowsLimitSelect('100', 100,  '#nuviad-exchanges-card')
+        rowsLimitSelect('10', 10,  '#nuviad-exchanges-card')
     })
 })
