@@ -118,7 +118,7 @@ describe('Table tests', function () {
         })
     }
 
-    it('Test table refreshing', function () {
+    /* it('Test table refreshing', function () {
         cy.get(':nth-child(2) > .sc-bdVaJa').click()
         cy.wait(3000)
         const token = Cypress.env('token');
@@ -153,5 +153,26 @@ describe('Table tests', function () {
         rowsLimitSelect('50', 50,  '#nuviad-exchanges-card')
         rowsLimitSelect('100', 100,  '#nuviad-exchanges-card')
         rowsLimitSelect('10', 10,  '#nuviad-exchanges-card')
+    })
+    it('Pagination test',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('input').type('test')
+        cy.wait(3000)
+        cy.get('.paginate_button').then($el=>{
+            for(let i=2;i<$el.length-1;i++){
+                cy.get($el).eq(i).click()
+                cy.wait(3000)
+                cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=${i*10-10}&sort=-name&q=test`,Authorization)
+            }           
+        })
+        cy.get('input').clear()
+    }) */
+    it('Test actions',function(){
+        cy.get('input').type('sivan test')
+        cy.wait(3000)
+        cy.get(':nth-child(5) > :nth-child(5) > .btn-group > :nth-child(1) > svg').click()
+        cy.get('.modal-content').should('be.visible')
+        cy.get('#name').should('have.value','sivan test')
     })
 })
