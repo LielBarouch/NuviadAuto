@@ -97,6 +97,19 @@ Cypress.Commands.add('checkApiLoadPOST',(apiUrl,Authorization)=>{
     
 })
 
+Cypress.Commands.add('checkApiLoadPUT',(apiUrl,Authorization)=>{
+    const apiToTest={
+        method:'PUT',
+            url:apiUrl,
+            headers:{
+                Authorization,
+            }
+        }
+    cy.request(apiToTest).its('status').should('eq',200)
+    cy.request(apiToTest).its('body').should('not.be.empty')
+    
+})
+
 Cypress.Commands.add('selectTableRows',(selection,selectionToCompair,tableNum,table)=>{
     cy.get('select').eq(tableNum).select(selection)
     cy.wait(3000)
