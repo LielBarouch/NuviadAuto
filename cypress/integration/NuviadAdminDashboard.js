@@ -879,7 +879,8 @@ describe('Daily actors spend', function () {
         cy.get('#nuviad-daily-actor-spend-card > .pt-3 > :nth-child(1) > .col-lg-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
         let currentDate = dayjs()
         let yesterday = currentDate.subtract(1, 'days')
-        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).click()
+        cy.log(yesterday.format('DD'))
+        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).eq(0).click()
         cy.wait(5000)
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/accounts/daily/summary?date=${yesterday.format('YYYY-MM-DD')}`, Authorization)
         let actorsCountCheck = 0
