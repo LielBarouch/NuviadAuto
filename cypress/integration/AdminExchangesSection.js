@@ -97,7 +97,7 @@ describe('Exchanges section', function () {
     })
 })
 
-/* describe('Table tests', function () {
+describe('Table tests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -541,7 +541,7 @@ describe('Test inactive exchanges in actor campaign',function(){
         cy.get(':nth-child(3) > .nav-sub-link').click()
         cy.wait(3000)
     })
-}) */
+})
 
 describe('Create new exchange',function(){
     beforeEach(function () {
