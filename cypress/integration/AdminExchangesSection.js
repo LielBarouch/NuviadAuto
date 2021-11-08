@@ -84,8 +84,7 @@ describe('Exchanges section', function () {
         cy.getToken("liel@nuviad.com", "lb123456")
     })
     it('Enter Exchanges section', function () {
-        cy.get('.with-sub > .nav-link').click()
-        cy.get(':nth-child(3) > .nav-sub-link').click()
+        cy.get(':nth-child(5) > .nav-link').click()
         cy.wait(3000)
 
     })
@@ -421,8 +420,7 @@ describe('Test active exchange in actor campaign', function () {
         cy.get('.btn-brand-02').click()
         cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
         cy.wait(10000)
-        cy.get('.with-sub > .nav-link').click()
-        cy.get(':nth-child(3) > .nav-sub-link').click()
+        cy.get(':nth-child(5) > .nav-link').click()
         cy.wait(3000)
     })
 
@@ -537,8 +535,7 @@ describe('Test inactive exchanges in actor campaign',function(){
         cy.get('.btn-brand-02').click()
         cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
         cy.wait(10000)
-        cy.get('.with-sub > .nav-link').click()
-        cy.get(':nth-child(3) > .nav-sub-link').click()
+        cy.get(':nth-child(5) > .nav-link').click()
         cy.wait(3000)
     })
 })
