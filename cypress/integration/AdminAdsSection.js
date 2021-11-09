@@ -70,7 +70,7 @@ describe('Test pending ads table', function () {
                 cy.wrap(adsCount).should('eq', response.body.meta_data.total)
                 let count = 0;
                 for (let i = 0; i < response.body.items.length; i++) {
-                    if (response.body.items[i].owner == "actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO" && response.body.items[i].approved == false) {
+                    if (response.body.items[i].owner == "actor_TPrgTKLaeL4qNVuNliGsqwe9imAzB" && response.body.items[i].approved == false) {
                         count++;
                     }
                 }
@@ -80,17 +80,17 @@ describe('Test pending ads table', function () {
         })
     })
     it('Test search', function () {
-        cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('Patternz')
+        cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
         cy.request(getAdsApi(this.data)).then(response => {
             if (response.body.meta_data.total) {
                 let count = 0;
                 for (let i = 0; i < response.body.items.length; i++) {
-                    if (response.body.items[i].owner == "actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO" && response.body.items[i].approved == false) {
+                    if (response.body.items[i].owner == "actor_TPrgTKLaeL4qNVuNliGsqwe9imAzB" && response.body.items[i].approved == false) {
                         count++;
                     }
                 }
                 cy.log(count)
-                cy.get('.dataTables_info').eq(0).should('contain.text', count)
+                cy.get('.dataTables_info').should('contain.text', count)
             }
 
             cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').clear()
@@ -103,7 +103,8 @@ describe('Test pending ads table', function () {
         cy.selectTableRows('10', 10, 0, '#nuviad-ads-card')
     })
     it('Ad preview', function () {
-        cy.get(':nth-child(1) > :nth-child(8) > .btn-group > :nth-child(1) > svg').click()
-        cy.get('.btn-primary').click()
+        cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
+        cy.wait(4000)
+        
     })
 })

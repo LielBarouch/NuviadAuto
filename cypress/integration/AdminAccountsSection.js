@@ -40,7 +40,7 @@ describe('Accounts section', function () {
     })
 })
 
-describe('Test pending accounts table',function(){
+/* describe('Test pending accounts table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -156,9 +156,9 @@ describe('Test pending accounts table',function(){
     it('Views today sorting',function(){
         accountsSorting(7,`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=views_today`,`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=-views_today`)
     })
-}) 
+})  */
 
-describe('Create credit request through accounts table',function(){
+/* describe('Create credit request through accounts table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -214,14 +214,91 @@ describe('Create credit request through accounts table',function(){
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(6000)
     })
-    it('Compare api data and credit request details',function(){
-        let amount=5
-        cy.intercept(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests`)).then((response)=>{
-            cy.log(response.status)
-            cy.log(response.body.status)
-            cy.log(response.body.requester_id)
-            amount=Number(response.body.amount)
-            cy.log(amount)
+    
+}) */
+
+describe('Allowed features',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
         })
+        cy.getToken("liel@nuviad.com", "lb123456")
     })
+    /* it('Switch to active accounts view', function () {
+        cy.get('#nuviad-accounts-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.contains('ALL').click()
+
+    })
+    it('Search for a testing account',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('TestUser')
+        cy.wait(3000)
+    })
+    it('Open the allowed features modal',function(){
+        cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
+    })
+    it('Allow Use JS tags, Vast tags and Create video ad',function(){
+        cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('#react-select-11-option-1').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-2').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-20').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-35').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(20000)
+    }) */
+    it('Check if allowed',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+        cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
+        cy.get('.btn').click()
+        cy.wait(6000)
+        cy.get(':nth-child(5) > a').click()
+        cy.get('#upload-ads-button').click()
+        cy.contains('Use Ad tag').should('be.visible')
+        cy.contains('Use VAST').should('be.visible')
+        cy.contains('Create video Ad').should('be.visible')
+        cy.contains('Landing Pages').should('be.visible')
+    })
+    /* it('Login again to admin dashboard',function(){
+        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+    })
+    it('Enter Exchanges section', function () {
+        cy.get(':nth-child(3) > .nav-link').click()
+        cy.wait(3000)
+
+    })
+    it('Switch to active accounts view', function () {
+        cy.get('#nuviad-accounts-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.contains('ALL').click()
+
+    })
+    it('Search for a testing account',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('TestUser')
+        cy.wait(3000)
+    })
+    it('Open the allowed features modal',function(){
+        cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
+    })
+    it('Disable Use JS tags, Vast tags and Create video ad',function(){
+        cy.get(':nth-child(1) > .css-19bqh2r').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(20000)
+    })
+    it('Check if disabled',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+        cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
+        cy.get('.btn').click()
+        cy.wait(6000)
+        cy.get(':nth-child(5) > a').click()
+        cy.get('#upload-ads-button').click()
+        
+        cy.contains('Use Ad tag').should('not.be.visible')
+        cy.contains('Use VAST').should('not.be.visible')
+        
+    }) */
 })

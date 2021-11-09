@@ -105,75 +105,6 @@ describe('Login Admin dashboard', function () {
     
 }) */
 
-
-describe('Create credit request through accounts table',function(){
-    beforeEach(function () {
-        cy.fixture('example').then(function (data) {
-            this.data = data
-        })
-        cy.getToken("liel@nuviad.com", "lb123456")
-    })
-    function getAccountsApi(urlToTest){
-        const token = Cypress.env('token');
-        const Authorization = token;
-        const apiToTest = {
-            method: 'GET',
-            url: urlToTest,
-            headers: {
-                Authorization,
-            },
-            body: {}
-        }
-        return apiToTest
-    }
-    function getCreditApi(urlToTest){
-        const token = Cypress.env('token');
-        const Authorization = token;
-        const apiToTest = {
-            method: 'POST',
-            url: urlToTest,
-            headers: {
-                Authorization,
-            },
-            body: {}
-        }
-        return apiToTest
-    }
-    it('View active accounts',function(){
-        cy.get('#nuviad-accounts-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
-        cy.contains('ACTIVE').click()
-    })
-    it('User check',function(){
-        let userName=''
-        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('Patternz')
-        cy.wait(3000)
-        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .table > tbody > :nth-child(2) > :nth-child(2)').then($nameText=>{
-            cy.get('#nuviad-accounts-table > .dataTables_wrapper > .table > tbody > :nth-child(2) > :nth-child(5)').then($emailText=>{
-                userName=$nameText.text()+" ("+$emailText.text()+")"
-                cy.get(':nth-child(2) > :nth-child(12) > .btn-group > :nth-child(4) > svg').click()
-                cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').should('contain.text',userName)
-            })  
-        })
-    })
-    it('Creating a credit request with negative value',function(){
-        cy.get('#amount').clear()
-        cy.get('#amount').type('-50')
-        cy.get('#notes').type('Automation test')
-        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
-        cy.wait(6000)
-    })
-    it('Compare api data and credit request details',function(){
-        let amount=5
-        cy.intercept(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests`)).then((response)=>{
-            cy.log(response.status)
-            cy.log(response.body.status)
-            cy.log(response.body.requester_id)
-            amount=Number(response.body.amount)
-            cy.log(amount)
-        })
-    })
-})
-
 /* describe('Test transactions table',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -344,8 +275,8 @@ describe('Create credit request through accounts table',function(){
             }
         })
     })
-}) */
-/* describe('Test credit request approving process',function(){
+})
+describe('Test credit request approving process',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -410,9 +341,9 @@ describe('Create credit request through accounts table',function(){
             cy.wrap(credit).should('eq',creditToComp)
         })
     })
-}) */
+})
 
-/* describe('Test credit request rejecting process',function(){
+describe('Test credit request rejecting process',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -583,7 +514,7 @@ describe('Create credit request through accounts table',function(){
     })
 }) */
 
-describe('Daily actors spend', function () {
+/* describe('Daily actors spend', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -622,78 +553,14 @@ describe('Daily actors spend', function () {
             cy.get('#nuviad-daily-actor-spend-table > .dataTables_wrapper > .dataTables_info').should('contain.text', actorsCount + " entries")
         })
     })
-    /* it('Compare table data to API data', function () {
-        let currentDate = dayjs()
-        let actorsCountCheck = 0
-        cy.request(getActorSpendAPI(`${this.data.API_BASE_URL}/admin/stats/accounts/daily/summary?date=${currentDate.format('YYYY-MM-DD')}`)).then(response => {
-            for (let i = 0; i < response.body.related_entities.accounts.length; i++) {
-                for (let j = 0; j < response.body.related_entities.accounts.length; j++) {
-                    cy.get(`#nuviad-daily-actor-spend-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(1)`).then($el => {
-                        let elementText = $el.text()
-                        let nameInApi = response.body.related_entities.accounts[i].name
-                        cy.log(elementText)
-                        cy.log(nameInApi)
-                        if (elementText == nameInApi) {
-                            cy.log('lalala')
-                            actorsCountCheck++
-                            for (let t = 0; t < response.body.rows.length; t++) {
-                                if (response.body.rows[t].actor_id == response.body.related_entities.accounts[i].id) {
-                                    for (let k = 2; k <= 7; k++) {
-                                        cy.get(`#nuviad-daily-actor-spend-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(${k})`).then($el => {
-                                            let elementValue = $el.text()
-                                            if (k == 2) {
-                                                elementValue = Number(elementValue.replace(/\$|,/g, ''))
-                                                expect(elementValue).eq(response.body.rows[t].impressions)
-                                            }
-                                            if (k == 3) {
-                                                elementValue = Number(elementValue.replace(/\$|,/g, ''))
-                                                expect(elementValue).eq(response.body.rows[t].clicks)
-                                            }
-                                            if (k == 4) {
-                                                elementValue = Number(elementValue.replace(/\$|,/g, '')).toFixed(1)
-                                                let cpc = (response.body.rows[t].cpc).toFixed(1)
-                                                expect(elementValue).eq(cpc)
-                                            }
-                                            if (k == 5) {
-                                                elementValue = Number(elementValue.replace("%", '')).toFixed(2)
-                                                let ctr = (response.body.rows[t].ctr).toFixed(2)
-                                                if (elementValue > 1) {
-                                                    elementValue = Math.round(elementValue)
-                                                }
-                                                if (ctr > 1) {
-                                                    ctr = Math.round(ctr)
-                                                }
-                                                expect(elementValue).eq(ctr)
-                                            }
-                                            if (k == 6) {
-                                                elementValue = Number(elementValue.replace(/\$|,/g, '')).toFixed(1)
-                                                let cost = Number(response.body.rows[t].cost).toFixed(1)
-                                                expect(elementValue).eq(cost)
-                                            }
-                                            if (k == 7) {
-                                                elementValue = Number(elementValue.replace(/\$|,/g, '')).toFixed(0)
-                                                let spend = Number(response.body.rows[t].spend).toFixed(0)
-                                                expect(elementValue).eq(spend)
-                                            }
-                                        })
-                                    }
-                                }
-                            }
-                            cy.log(actorsCountCheck)
-                        }
-                    })
-                }
-            }
-            cy.log(actorsCountCheck).then(() => expect(actorsCountCheck).equal(response.body.related_entities.accounts.length))
-        })
-    }) */
+   
     it('Table rows display test', function () {
         cy.selectTableRows('25', 25, 4, '#nuviad-daily-actor-spend-card')
         cy.selectTableRows('50', 50, 4, '#nuviad-daily-actor-spend-card')
         cy.selectTableRows('10', 10, 4, '#nuviad-daily-actor-spend-card')
     })
 
-    it('Test date change', function () {
+    it('Test date change and compare table data with API data', function () {
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get('#nuviad-daily-actor-spend-card > .pt-3 > :nth-child(1) > .col-lg-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
@@ -762,9 +629,9 @@ describe('Daily actors spend', function () {
             cy.log(actorsCountCheck).then(() => expect(actorsCountCheck).equal(response.body.related_entities.accounts.length))
         })
     })
-})
+}) */
 
-/* describe('Allowed features',function(){
+describe('Allowed features',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -835,7 +702,7 @@ describe('Daily actors spend', function () {
         cy.get('.uib-dropdown-menu > :nth-child(4) > .ng-scope').should('not.be.visible')
         cy.get('.uib-dropdown-menu > :nth-child(5) > .ng-scope').should('not.be.visible')
     })
-}) */
+})
 
 /* describe('Daily exchanges spend', function () {
     beforeEach(function () {
@@ -924,8 +791,8 @@ describe('Daily actors spend', function () {
                                                 expect(elementText).eq(ctr)
                                             }
                                             if (k == 7) {
-                                                elementText = Number(elementText.replace(/\$|,/g, '')).toFixed(1)
-                                                let cost = Number(response.body.rows[i].cost).toFixed(1)
+                                                elementText = Number(elementText.replace(/\$|,/g, '')).toFixed(2)
+                                                let cost = Number(response.body.rows[i].cost).toFixed(2)
                                                 expect(elementText).eq(cost)
                                             }
                                             if (k == 8) {
