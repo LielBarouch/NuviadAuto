@@ -230,24 +230,34 @@ describe('Allowed features',function(){
 
     })
     it('Search for a testing account',function(){
-        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('TestUser')
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('AutoTest')
         cy.wait(3000)
     })
     it('Open the allowed features modal',function(){
         cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
     })
-    it('Allow Use JS tags, Vast tags and Create video ad',function(){
+    it('Allow Use JS tags, Vast tags, Create video ad, Landing pages, Audience segments, GEO traps,Targeting lists,Frequency Cap and Campaigns bulk update',function(){
         cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
         cy.get('#react-select-11-option-1').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
         cy.get('#react-select-11-option-2').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-10').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
         cy.get('#react-select-11-option-20').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-21').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-27').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
         cy.get('#react-select-11-option-35').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-7').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-32').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(20000)
-    }) */
+    })
     it('Check if allowed',function(){
         cy.visit(`${this.data.NuviadDashboard}/login/#`)
         cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
@@ -259,6 +269,111 @@ describe('Allowed features',function(){
         cy.contains('Use VAST').should('be.visible')
         cy.contains('Create video Ad').should('be.visible')
         cy.contains('Landing Pages').should('be.visible')
+        cy.contains('GEO Traps').should('be.visible')
+        cy.contains('Targeting Lists').should('be.visible')
+        cy.contains('Audience Segments').should('be.visible')
+        cy.get('.menu-links > :nth-child(2) > a').click()
+        cy.wait(3000)
+        cy.contains('Frequency Cap').should('be.visible')
+        cy.get('.md-checkbox-column > .ng-scope > .md-container').click()
+        cy.get(':nth-child(2) > .btn-group').click()
+        cy.contains('Update campaigns').should('be.visible')
+
+    })
+    it('Login again to admin dashboard',function(){
+        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+    })
+    it('Enter Exchanges section', function () {
+        cy.get(':nth-child(3) > .nav-link').click()
+        cy.wait(3000)
+
+    })
+    it('Switch to active accounts view', function () {
+        cy.get('#nuviad-accounts-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.contains('ALL').click()
+
+    })
+    it('Search for a testing account',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('AutoTest')
+        cy.wait(3000)
+    })
+    it('Open the allowed features modal',function(){
+        cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
+    })
+    it('Disable Use JS tags, Vast tags, Create video ad, Landing pages, Audience segments, GEO traps,Targeting lists,Frequency Cap and Campaigns bulk update',function(){
+        cy.get(':nth-child(1) > .css-19bqh2r').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(20000)
+    })
+    it('Check if disabled',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+        cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
+        cy.get('.btn').click()
+        cy.wait(6000)
+        cy.get(':nth-child(5) > a').click()
+        cy.get('#upload-ads-button').click()
+        cy.contains('Use Ad tag').should('not.be.visible')
+        cy.contains('Use VAST').should('not.be.visible')
+        cy.get('.menu-links>li').then($el=>{
+            expect($el.length).to.eq(12)
+        })
+        cy.get('.menu-links > :nth-child(2) > a').click()
+        cy.wait(3000)
+        cy.contains('Frequency Cap').should('not.be.visible')
+        cy.get('.md-checkbox-column > .ng-scope > .md-container').click()
+        cy.get(':nth-child(2) > .btn-group').click()
+        cy.get('.uib-dropdown-menu>li>.ng-binding').then($el=>{
+            expect($el.length).to.eq(4)
+        })
+    }) */
+    
+    it('Login again to admin dashboard',function(){
+        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+    })
+    it('Enter Exchanges section', function () {
+        cy.get(':nth-child(3) > .nav-link').click()
+        cy.wait(3000)
+
+    })
+    it('Switch to active accounts view', function () {
+        cy.get('#nuviad-accounts-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
+        cy.contains('ALL').click()
+
+    })
+    it('Search for a testing account',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('AutoTest')
+        cy.wait(3000)
+    })
+    it('Open the allowed features modal',function(){
+        cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
+    })
+    it('Allow ZipCode targeting, Age targeting and Gender targeting',function(){
+        cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('#react-select-11-option-25').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-30').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.get('#react-select-11-option-31').click()
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(20000)
+    })
+    it('Check if allowed',function(){
+        cy.visit(`${this.data.NuviadDashboard}/login/#`)
+        cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
+        cy.get('.btn').click()
+        cy.wait(6000)
+        cy.get('.menu-links > :nth-child(2) > a').click()
+        cy.wait(3000)
+        cy.get('.md-body > :nth-child(1) > :nth-child(3)').click()
+        cy.get('fieldset > :nth-child(2) > .ng-scope > .ng-binding').should('be.visible')
     })
     /* it('Login again to admin dashboard',function(){
         cy.visit(`${this.data.NuviadAdminDashboard}/login`)
@@ -278,13 +393,13 @@ describe('Allowed features',function(){
 
     })
     it('Search for a testing account',function(){
-        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('TestUser')
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('AutoTest')
         cy.wait(3000)
     })
     it('Open the allowed features modal',function(){
         cy.get(':nth-child(1) > :nth-child(12) > .btn-group > :nth-child(6) > svg').click()
     })
-    it('Disable Use JS tags, Vast tags and Create video ad',function(){
+    it('Disable ZipCode targeting',function(){
         cy.get(':nth-child(1) > .css-19bqh2r').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(20000)
@@ -294,11 +409,11 @@ describe('Allowed features',function(){
         cy.dashboardLogin(this.data.TEST_USER,this.data.TEST_USER_PASS)
         cy.get('.btn').click()
         cy.wait(6000)
-        cy.get(':nth-child(5) > a').click()
-        cy.get('#upload-ads-button').click()
-        
-        cy.contains('Use Ad tag').should('not.be.visible')
-        cy.contains('Use VAST').should('not.be.visible')
-        
+        cy.get('.menu-links > :nth-child(2) > a').click()
+        cy.wait(3000)
+        cy.get('.md-body > :nth-child(1) > :nth-child(3)').click()
+        cy.get('.col-md-12>div>fieldset>div>.radio').then($el=>{
+            expect($el.length).to.eq(2)
+        })
     }) */
 })
