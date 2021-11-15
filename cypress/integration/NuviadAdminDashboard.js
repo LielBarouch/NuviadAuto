@@ -37,14 +37,14 @@ describe('Login Admin dashboard', function () {
 
     }) */
 })
-/* describe('Stats and APIs tests',function(){
+describe('Stats and APIs tests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function getApiRes(data){
+    function getApiRes(data) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -53,8 +53,8 @@ describe('Login Admin dashboard', function () {
             headers: {
                 Authorization,
             },
-            body:{}
-        } 
+            body: {}
+        }
         return apiToTest
     }
     it('Check stats and charts APIs', function () {
@@ -68,7 +68,7 @@ describe('Login Admin dashboard', function () {
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`, Authorization)
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/campaigns/daily/summary`, Authorization)
     })
-    it('Check stats data',{retries:{openMode:3}}, function () {
+    it('Check stats data', { retries: { openMode: 3 } }, function () {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -77,42 +77,42 @@ describe('Login Admin dashboard', function () {
             headers: {
                 Authorization,
             },
-            body:{}
+            body: {}
         }
-        cy.get(':nth-child(4) > .sc-bdVaJa').click({force:true})
-        cy.request(apiToTest).then(response=>{
-            const imp=Number(response.body.impressions)
-            const clicks=Number(response.body.clicks)
-            const cpc=Number(response.body.cpc)+0.1
-            const revenue=Number(response.body.revenue)
-            const cost=Number(response.body.cost)
-            const profit=Number(response.body.profit)
-            const arr=[imp,clicks,cpc,revenue,cost,profit]
-            var i=0
+        cy.get(':nth-child(4) > .sc-bdVaJa').click({ force: true })
+        cy.request(apiToTest).then(response => {
+            const imp = Number(response.body.impressions)
+            const clicks = Number(response.body.clicks)
+            const cpc = Number(response.body.cpc) + 0.1
+            const revenue = Number(response.body.revenue)
+            const cost = Number(response.body.cost)
+            const profit = Number(response.body.profit)
+            const arr = [imp, clicks, cpc, revenue, cost, profit]
+            var i = 0
 
-            cy.get('.tx-normal').each(($el,index,$list)=>{
-                var elValue=$el.text()
-                elValue=Number(elValue.replace(/\$|,/g, ''))
+            cy.get('.tx-normal').each(($el, index, $list) => {
+                var elValue = $el.text()
+                elValue = Number(elValue.replace(/\$|,/g, ''))
 
                 cy.log(elValue)
-                cy.wrap(arr[i]++).should('be.gte',elValue)
+                cy.wrap(arr[i]++).should('be.gte', elValue)
 
             })
 
 
         })
     })
-    
-}) */
 
-/* describe('Test transactions table',function(){
+})
+
+/* describe('Test transactions table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function getTransactionsApi(urlToTest){
+    function getTransactionsApi(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -125,72 +125,72 @@ describe('Login Admin dashboard', function () {
         }
         return apiToTest
     }
-    function transactionsSorting(col,apiUp,apiDown){
+    function transactionsSorting(col, apiUp, apiDown) {
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get(`#nuviad-billing-transactions-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
         cy.wait(3000)
-        cy.checkApiLoad(apiUp,Authorization)
+        cy.checkApiLoad(apiUp, Authorization)
         cy.get(`#nuviad-billing-transactions-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
         cy.wait(3000)
-        cy.checkApiLoad(apiDown,Authorization)
+        cy.checkApiLoad(apiDown, Authorization)
     }
-    it('Table rows display test',function(){
-        cy.selectTableRows('25',25,2,'#nuviad-billing-transactions-table')
-        cy.selectTableRows('50',50,2,'#nuviad-billing-transactions-table')
-        cy.selectTableRows('100',100,2,'#nuviad-billing-transactions-table')
-        cy.selectTableRows('10',10,2,'#nuviad-billing-transactions-table')
+    it('Table rows display test', function () {
+        cy.selectTableRows('25', 25, 2, '#nuviad-billing-transactions-table')
+        cy.selectTableRows('50', 50, 2, '#nuviad-billing-transactions-table')
+        cy.selectTableRows('100', 100, 2, '#nuviad-billing-transactions-table')
+        cy.selectTableRows('10', 10, 2, '#nuviad-billing-transactions-table')
     })
-    it('Search test',function(){
+    it('Search test', function () {
         cy.get('#nuviad-billing-transactions-table > .dataTables_wrapper > .dataTables_filter > label > input').type('Patternz')
         cy.wait(3000)
-        cy.request(getTransactionsApi(`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-created_at&q=Patternz`)).then(response=>{
-            for(let i=0;i<response.body.rows.length;i++){
-                cy.wrap(response.body.rows[i].custom).should('eq',"actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO")
+        cy.request(getTransactionsApi(`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-created_at&q=Patternz`)).then(response => {
+            for (let i = 0; i < response.body.rows.length; i++) {
+                cy.wrap(response.body.rows[i].custom).should('eq', "actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO")
             }
-            cy.get('#nuviad-billing-transactions-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
+            cy.get('#nuviad-billing-transactions-table > .dataTables_wrapper > .dataTables_info').should('contain.text', response.body.total_count)
         })
         cy.get('#nuviad-billing-transactions-table > .dataTables_wrapper > .dataTables_filter > label > input').clear()
         cy.wait(3000)
     })
-    it('ID sorting',function(){
-        transactionsSorting(1,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=txn_id`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-txn_id`)
+    it('ID sorting', function () {
+        transactionsSorting(1, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=txn_id`, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-txn_id`)
     })
-    it('Account sorting',function(){
-        transactionsSorting(2,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=custom`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-custom`)
+    it('Account sorting', function () {
+        transactionsSorting(2, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=custom`, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-custom`)
     })
-    it('Created at sorting',function(){
-        transactionsSorting(3,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=created_at`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-created_at`)
+    it('Created at sorting', function () {
+        transactionsSorting(3, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=created_at`, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-created_at`)
     })
-    it('Payment type sorting',function(){
-        transactionsSorting(4,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=payment_type`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-payment_type`)
+    it('Payment type sorting', function () {
+        transactionsSorting(4, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=payment_type`, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-payment_type`)
     })
-    it('Payment gross sorting',function(){
-        transactionsSorting(5,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=payment_gross`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-payment_gross`)
+    it('Payment gross sorting', function () {
+        transactionsSorting(5, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=payment_gross`, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-payment_gross`)
     })
-    it('Currency sorting',function(){
-        transactionsSorting(6,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=mc_currency`,`${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-mc_currency`)
+    it('Currency sorting', function () {
+        transactionsSorting(6, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=mc_currency`, `${this.data.API_BASE_URL}/admin/billing/transactions?limit=10&offset=0&sort=-mc_currency`)
     })
 }) */
-
-/* describe('Credit requests',function(){
+/*
+ describe('Credit requests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function creditSorting(col,apiUp,apiDown){
+    function creditSorting(col, apiUp, apiDown) {
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get(`#nuviad-credit-request-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
         cy.wait(3000)
-        cy.checkApiLoad(apiUp,Authorization)
-        cy.get(`#nuviad-credit-request-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click()
+        cy.checkApiLoad(apiUp, Authorization)
+        cy.get(`#nuviad-credit-request-table > .dataTables_wrapper > .table > thead > tr > :nth-child(${col})`).click({force:true})
         cy.wait(3000)
-        cy.checkApiLoad(apiDown,Authorization)
+        cy.checkApiLoad(apiDown, Authorization)
     }
-    function getCreditApi(urlToTest){
+    function getCreditApi(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -203,99 +203,109 @@ describe('Login Admin dashboard', function () {
         }
         return apiToTest
     }
-    it('Account sorting',function(){
-        creditSorting(1,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=account_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-account_id&status=PENDING`)
+    it('Account sorting', function () {
+        creditSorting(1, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=account_id&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-account_id&status=PENDING`)
     })
-    it('Created at sorting',function(){
-        creditSorting(3,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=created_at&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`)
+    it('Created at sorting', function () {
+        creditSorting(3, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=created_at&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`)
     })
-    it('Updated at sorting',function(){
-        creditSorting(4,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=updated_at&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-updated_at&status=PENDING`)
+    it('Updated at sorting', function () {
+        creditSorting(4, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=updated_at&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-updated_at&status=PENDING`)
     })
-    it('Amount sorting',function(){
-        creditSorting(5,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=amount&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-amount&status=PENDING`)
+    it('Amount sorting', function () {
+        creditSorting(5, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=amount&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-amount&status=PENDING`)
     })
-    it('Currency sorting',function(){
-        creditSorting(6,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=currency&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-currency&status=PENDING`)
+    it('Currency sorting', function () {
+        creditSorting(6, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=currency&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-currency&status=PENDING`)
     })
-    it('Notes sorting',function(){
-        creditSorting(7,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=notes&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-notes&status=PENDING`)
+    it('Notes sorting', function () {
+        creditSorting(7, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=notes&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-notes&status=PENDING`)
     })
-    it('ID sorting',function(){
-        creditSorting(8,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-_id&status=PENDING`)
+    it('ID sorting', function () {
+        creditSorting(8, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=_id&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-_id&status=PENDING`)
     })
-    it('Requester sorting',function(){
-        creditSorting(9,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=requester_id&status=PENDING`,`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-requester_id&status=PENDING`)
+    it('Requester sorting', function () {
+        creditSorting(9, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=requester_id&status=PENDING`, `${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-requester_id&status=PENDING`)
     })
-    it('Refresh table',function(){
+    it('Refresh table', function () {
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get('.align-items-center > .d-flex > :nth-child(2) > .sc-bdVaJa').click
-        cy.wait(4000)
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`,Authorization)
+        cy.wait(6000)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`, Authorization)
     })
-    it('View all requests',function(){
+    it('View all requests', function () {
         cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container > .css-yk16xz-control').click()
         cy.contains('ALL').click()
         cy.wait(3000)
-        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at`)).then(response=>{
-            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at`)).then(response => {
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text', response.body.total_count)
         })
     })
-    it('View approved requests',function(){
+    it('View approved requests', function () {
         cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
         cy.contains('APPROVED').click()
         cy.wait(3000)
-        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=APPROVED`)).then(response=>{
-            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
-            for(let i=0;i<response.body.rows.lenght;i++){
-                cy.wrap(response.body.rows[i].status).should('eq','APPROVED')
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=APPROVED`)).then(response => {
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text', response.body.total_count)
+            for (let i = 0; i < response.body.rows.lenght; i++) {
+                cy.wrap(response.body.rows[i].status).should('eq', 'APPROVED')
             }
         })
     })
-    it('View rejected requests',function(){
+    it('View rejected requests', function () {
         cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
         cy.contains('REJECTED').click()
         cy.wait(3000)
-        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=REJECTED`)).then(response=>{
-            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
-            for(let i=0;i<response.body.rows.lenght;i++){
-                cy.wrap(response.body.rows[i].status).should('eq','REJECTED')
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=REJECTED`)).then(response => {
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text', response.body.total_count)
+            for (let i = 0; i < response.body.rows.lenght; i++) {
+                cy.wrap(response.body.rows[i].status).should('eq', 'REJECTED')
             }
         })
     })
-    it('View pending requests',function(){
+    it('View pending requests', function () {
         cy.get('#nuviad-credit-request-card > .card-body > :nth-child(1) > .col-lg-3 > .css-2b097c-container').click()
         cy.contains('PENDING').click()
         cy.wait(3000)
-        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`)).then(response=>{
-            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text',response.body.total_count)
-            for(let i=0;i<response.body.rows.lenght;i++){
-                cy.wrap(response.body.rows[i].status).should('eq','PENDING')
+        cy.request(getCreditApi(`${this.data.API_BASE_URL}/admin/credit_requests?limit=10&offset=0&sort=-created_at&status=PENDING`)).then(response => {
+            cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_info').should('contain.text', response.body.total_count)
+            for (let i = 0; i < response.body.rows.lenght; i++) {
+                cy.wrap(response.body.rows[i].status).should('eq', 'PENDING')
             }
         })
     })
+    it("Test actor details modal",function(){
+        const searchActor='LielTest'
+        cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .dataTables_filter > label > input').type(searchActor)
+        cy.get('#nuviad-credit-request-table > .dataTables_wrapper > .table > tbody > :nth-child(1) > :nth-child(1) > a').click()
+        cy.get('.modal-body').should('be.visible')
+        cy.get(':nth-child(1) > .col-sm-10').then($el=>{
+            expect($el.text()).to.eq(searchActor)
+        })
+    })
 })
-describe('Test credit request approving process',function(){
+
+describe('Test credit request approving process', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    it('Login to dashboard',function(){
+    it('Login to dashboard', function () {
         cy.visit(`${this.data.NuviadDashboard}/login/#`)
     })
-    it('Login',function(){
-        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
-        cy.get('.btn').click() 
+    it('Login', function () {
+        cy.dashboardLogin(this.data.SUPER_USER, this.data.SUPER_PASS)
+        cy.get('.btn').click()
         cy.wait(6000)
     })
-    it('Get the credit amount of the user',function(){
+    it('Get the credit amount of the user', function () {
         cy.getToken("sivangrisario@gmail.com", "sivan")
-        cy.get('h3').eq(0).then(($el)=>{
-            let spending=$el.text()
-            initCredit=Number(spending.replace(/\$|,/g, ''))
+        cy.get('h3').eq(0).then(($el) => {
+            let spending = $el.text()
+            initCredit = Number(spending.replace(/\$|,/g, ''))
         })
     })
     it('Enter to the admin dashboard login', function () {
@@ -309,7 +319,7 @@ describe('Test credit request approving process',function(){
         cy.wait(10000)
         cy.log(initCredit)
     })
-    it('Create credit request',function(){
+    it('Create credit request', function () {
         cy.get('#nuviad-credit-request-card > .align-items-center > .d-flex > :nth-child(1) > .sc-bdVaJa').click()
         cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
         cy.get('.form-group > .css-2b097c-container').type('Patternz')
@@ -318,51 +328,51 @@ describe('Test credit request approving process',function(){
         cy.get('#amount').type(1000)
         cy.get('#notes').type('Automation test')
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
-        creditToComp=initCredit+1000
+        creditToComp = initCredit + 1000
     })
-    it('Approve request',function(){
+    it('Approve request', function () {
         cy.get(':nth-child(1) > :nth-child(10) > .btn-group > :nth-child(1) > svg').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(10000)
     })
-    it('Login to dashboard',function(){
+    it('Login to dashboard', function () {
         cy.visit(`${this.data.NuviadDashboard}/login/#`)
     })
-    it('Login',function(){
-        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
-        cy.get('.btn').click() 
+    it('Login', function () {
+        cy.dashboardLogin(this.data.SUPER_USER, this.data.SUPER_PASS)
+        cy.get('.btn').click()
         cy.wait(6000)
     })
-    it('Check credit change for the user',function(){
+    it('Check credit change for the user', function () {
         cy.getToken("sivangrisario@gmail.com", "sivan")
-        cy.get('h3').eq(0).then(($el)=>{
-            let credit=$el.text()
-            credit=Number(credit.replace(/\$|,/g, ''))
-            cy.wrap(credit).should('eq',creditToComp)
+        cy.get('h3').eq(0).then(($el) => {
+            let credit = $el.text()
+            credit = Number(credit.replace(/\$|,/g, ''))
+            cy.wrap(credit).should('eq', creditToComp.toFixed(2))
         })
     })
 })
 
-describe('Test credit request rejecting process',function(){
+describe('Test credit request rejecting process', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    it('Login to dashboard',function(){
+    it('Login to dashboard', function () {
         cy.visit(`${this.data.NuviadDashboard}/login/#`)
     })
-    it('Login',function(){
-        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
-        cy.get('.btn').click() 
+    it('Login', function () {
+        cy.dashboardLogin(this.data.SUPER_USER, this.data.SUPER_PASS)
+        cy.get('.btn').click()
         cy.wait(6000)
     })
-    it('Get the credit amount of the user',function(){
+    it('Get the credit amount of the user', function () {
         cy.getToken("sivangrisario@gmail.com", "sivan")
-        cy.get('h3').eq(0).then(($el)=>{
-            let credit=$el.text()
-            initCredit=Number(credit.replace(/\$|,/g, ''))
+        cy.get('h3').eq(0).then(($el) => {
+            let credit = $el.text()
+            initCredit = Number(credit.replace(/\$|,/g, ''))
         })
     })
     it('Enter to the admin dashboard login', function () {
@@ -376,7 +386,7 @@ describe('Test credit request rejecting process',function(){
         cy.wait(10000)
         cy.log(initCredit)
     })
-    it('Create credit request',function(){
+    it('Create credit request', function () {
         cy.get('#nuviad-credit-request-card > .align-items-center > .d-flex > :nth-child(1) > .sc-bdVaJa').click()
         cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
         cy.get('.form-group > .css-2b097c-container').type('Patternz')
@@ -385,27 +395,27 @@ describe('Test credit request rejecting process',function(){
         cy.get('#amount').type(1000)
         cy.get('#notes').type('Automation test')
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
-        
+
     })
-    it('Reject request',function(){
+    it('Reject request', function () {
         cy.get(':nth-child(1) > :nth-child(10) > .btn-group > :nth-child(2) > svg').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(3000)
     })
-    it('Login to dashboard',function(){
+    it('Login to dashboard', function () {
         cy.visit(`${this.data.NuviadDashboard}/login/#`)
     })
-    it('Login',function(){
-        cy.dashboardLogin(this.data.SUPER_USER,this.data.SUPER_PASS)
-        cy.get('.btn').click() 
+    it('Login', function () {
+        cy.dashboardLogin(this.data.SUPER_USER, this.data.SUPER_PASS)
+        cy.get('.btn').click()
         cy.wait(6000)
     })
-    it('Check credit change for the user',function(){
+    it('Check credit change for the user', function () {
         cy.getToken("sivangrisario@gmail.com", "sivan")
-        cy.get('h3').eq(0).then(($el)=>{
-            let credit=$el.text()
-            credit=Number(credit.replace(/\$|,/g, ''))
-            cy.wrap(credit).should('eq',initCredit)
+        cy.get('h3').eq(0).then(($el) => {
+            let credit = $el.text()
+            credit = Number(credit.replace(/\$|,/g, ''))
+            cy.wrap(credit).should('eq', initCredit)
         })
     })
     it('Enter to the admin dashboard login', function () {
@@ -419,7 +429,7 @@ describe('Test credit request rejecting process',function(){
         cy.wait(10000)
         cy.log(initCredit)
     })
-}) */
+})*/
 
 /* describe('Charts',function(){
     beforeEach(function () {
@@ -513,8 +523,8 @@ describe('Test credit request rejecting process',function(){
         })
     })
 }) */
-
-/* describe('Daily actors spend', function () {
+/*
+describe('Daily actors spend', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -553,7 +563,7 @@ describe('Test credit request rejecting process',function(){
             cy.get('#nuviad-daily-actor-spend-table > .dataTables_wrapper > .dataTables_info').should('contain.text', actorsCount + " entries")
         })
     })
-   
+
     it('Table rows display test', function () {
         cy.selectTableRows('25', 25, 4, '#nuviad-daily-actor-spend-card')
         cy.selectTableRows('50', 50, 4, '#nuviad-daily-actor-spend-card')
@@ -629,10 +639,10 @@ describe('Test credit request rejecting process',function(){
             cy.log(actorsCountCheck).then(() => expect(actorsCountCheck).equal(response.body.related_entities.accounts.length))
         })
     })
-}) */
+})
 
 
-/* describe('Daily exchanges spend', function () {
+describe('Daily exchanges spend', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -662,17 +672,17 @@ describe('Test credit request rejecting process',function(){
         cy.selectTableRows('10', 10, 4, '#nuviad-daily-exchange-spend-card')
     })
 
-    it('Refresh table',function(){
+    it('Refresh table', function () {
         const currentDate = dayjs()
         cy.get('#nuviad-daily-exchange-spend-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
         cy.wait(5000)
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/spend?date=${currentDate.format('YYYY-MM-DD')}`,Authorization)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/spend?date=${currentDate.format('YYYY-MM-DD')}`, Authorization)
     })
 
 
-    it('Test date change and compare table data to API data',function(){
+    it('Test date change and compare table data to API data', function () {
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get('#nuviad-daily-exchange-spend-card > .pt-3 > :nth-child(1) > .col-lg-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
@@ -703,8 +713,8 @@ describe('Test credit request rejecting process',function(){
                                             if (k == 5) {
                                                 elementText = Number(elementText.replace(/\$|,/g, '')).toFixed(2)
                                                 let cpc = (response.body.rows[i].cpc).toFixed(2)
-                                                
-                                                
+
+
                                                 expect(elementText).eq(cpc)
                                             }
                                             if (k == 6) {
@@ -744,9 +754,9 @@ describe('Test credit request rejecting process',function(){
 
         })
     })
-}) */
+})
 
-/* describe('Daily Campaign Performance', function () {
+describe('Daily Campaign Performance', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -812,6 +822,96 @@ describe('Test credit request rejecting process',function(){
                 expect($tableRow.length).to.eq(response.body.rows.length)
             })
         })
-        
+
     })
-}) */
+}) 
+*/
+
+describe('Daily exchanges requests', function () {
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+
+    function getExchangesRequestsAPI(urlToTest) {
+        let currentDate = dayjs()
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Table rows display test', function () {
+        cy.wait(8000)
+        cy.selectTableRows('25', 25, 5, '#nuviad-daily-exchange-requests-card')
+        cy.selectTableRows('50', 50, 5, '#nuviad-daily-exchange-requests-card')
+        cy.selectTableRows('10', 10, 5, '#nuviad-daily-exchange-requests-card')
+    })
+
+    it('Refresh table', function () {
+        const currentDate = dayjs()
+        cy.get('#nuviad-daily-exchange-requests-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(5000)
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${currentDate.format('YYYY-MM-DD')}`, Authorization)
+    })
+
+
+    it('Test date change and compare table data to API data', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-daily-exchange-requests-card > .pt-3 > :nth-child(1) > .col-lg-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        let currentDate = dayjs()
+        let yesterday = currentDate.subtract(1, 'days')
+        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).eq(0).click()
+        cy.wait(5000)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${yesterday.format('YYYY-MM-DD')}`, Authorization)
+        cy.request(getExchangesRequestsAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${yesterday.format('YYYY-MM-DD')}`)).then(response => {
+            cy.get('#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table>tbody>tr').then($row => {
+                for (let i = 0; i < response.body.rows.length; i++) {
+                    for (let j = 0; j < $row.length; j++) {
+                        for(let t=0;t<response.body.related_entities.exchanges.length;t++){
+                            if(response.body.rows[i].exchange==response.body.related_entities.exchanges[t].id){
+                                cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(1)`).then($el => {
+                                    if(response.body.related_entities.exchanges[t].name==$el.text()){
+                                        
+                                        for(let k=2;k<=4;k++){
+                                            cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(${k})`).then($element=>{
+                                                if(k==2){
+                                                    expect($element.text()).to.eq(response.body.rows[i].exchange)
+                                                }
+                                                if(k==3){
+                                                    let num=Number($element.text())
+                                                    expect(num).to.eq(response.body.related_entities.exchanges[t].num)
+                                                }
+                                                
+                                            })
+                                        }
+                                        cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j+1}) > .sorting_1`).then($req=>{
+                                            let requests=$req.text()
+                                            requests=Number(requests.replace(/\$|,/g, ''))
+                                            expect(requests).to.eq(response.body.rows[i].requests)
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                        
+
+                    }
+                }
+            })
+
+        })
+    })
+})

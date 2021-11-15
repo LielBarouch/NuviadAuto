@@ -9,9 +9,11 @@
   "TEST_USER_PASS":"123456",
   "HubzityBaseURL":"https://express-stg.hubzity.com/#",
   "NuviadExpressBaseURL":"https://express-stg.nuviad.com/#",
+  "ADMIN_PROD_URL":"https://admin.nuviad.com",
   "NuviadAdminDashboard":"https://admin-stg.nuviad.com",
   "HubzityAdminDashboard":"https://admin.hubzity.com",
   "NuviadDashboard":"https://my-stg.nuviad.com",
+  "NUVIAD_PROD_DASHBOARD":"https://my.nuviad.com",
   "HubzityDashborad":"https://my.hubzity.com",
   "API_BASE_URL":"http://api-stg.nuviad.com/api"
 }
