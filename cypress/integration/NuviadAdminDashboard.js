@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 let initCredit = 0
 let creditToComp = 0
+const qps = 120
 const dayjs = require('dayjs')
 
 describe('Login Admin dashboard', function () {
@@ -432,14 +433,14 @@ describe('Test credit request rejecting process', function () {
     })
 }) */
 
-describe('Charts',function(){
+describe('Charts', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function getMinApi(urlToTest){
+    function getMinApi(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -452,7 +453,7 @@ describe('Charts',function(){
         }
         return apiToTest
     }
-    it('Check actors names in Wins per minutes chart',function(){
+    /* it('Check actors names in Wins per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
         cy.wait(7000)
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > span').then($updated=>{
@@ -532,7 +533,7 @@ describe('Charts',function(){
         })
     })
 
-    it('Exchange minute traffice',function(){
+    it('Exchange minute traffice chart' ,{retries:3},function(){
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get('#nuviad-exchange-minute-traffic-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
@@ -544,22 +545,140 @@ describe('Charts',function(){
         cy.get('.col-sm-2 > .css-2b097c-container > .css-yk16xz-control').click()
         cy.get('.css-11unzgr').contains('2').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=2`,Authorization)
-        cy.wait(3000)
-        cy.get('.col-sm-2 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.wait(5000)
+        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
         cy.get('.css-11unzgr').contains('3').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=3`,Authorization)
-        cy.wait(3000)
-        cy.get('.col-sm-2 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.wait(5000)
+        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
         cy.get('.css-11unzgr').contains('6').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=6`,Authorization)
-        cy.wait(3000)
-        cy.get('.col-sm-2 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.wait(5000)
+        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
         cy.get('.css-11unzgr').contains('12').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=6`,Authorization)
-        cy.wait(3000)
-        cy.get('.col-sm-2 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=12`,Authorization)
+        cy.wait(5000)
+        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
         cy.get('.css-11unzgr').contains('24').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=6`,Authorization)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=24`,Authorization)
+        cy.wait(5000)
+        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
+        cy.get('.css-11unzgr').contains('48').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=48`,Authorization)
+        cy.wait(5000)
+        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
+        cy.get('.css-11unzgr').contains('72').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=72`,Authorization)
+        cy.get('.col-sm-4 > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
+        cy.get('.css-11unzgr').contains('Beachfront').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_sQcqbo4KvZ/minute_traffic?hours=72`,Authorization)
+    })
+    it('Check if Exchange minute traffice chart is visable to non-admin user',function(){
+        cy.get('.avatar-initial').click({force:true})
+        cy.get('.dropdown-item').click({force:true})
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
+        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.wait(3000)
+        cy.AdminLogin("stg-admin@nuviad.com", "qwerty123")
+        cy.get('.btn-brand-02').click()
+
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+        cy.get('#nuviad-exchange-minute-traffic-card').should('not.exist')
+        cy.get('.avatar-initial').click({force:true})
+        cy.get('.dropdown-item').click({force:true})
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
+        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.wait(3000)
+        cy.AdminLogin(this.data.emailAdmin, this.data.password)
+        cy.get('.btn-brand-02').click()
+        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.wait(10000)
+    })
+
+    it('Test Exchanges Minute QPS by server', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-exchange-minute-qps-by-server-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(20000)
+        cy.get('#nuviad-exchange-minute-qps-by-server-card > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`, Authorization)
+        cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`)).then(response => {
+            for (let i = 0; i < response.body.rows.length / 2; i++) {
+                cy.get('#nuviad-exchange-minute-qps-by-server-card').find('.recharts-legend-item-text').then($el => {
+                    let flag = false
+                    for (let j = 0; j < $el.length; j++) {
+                        let serv = $el.eq(j)
+                        serv = serv.text()
+                        if (serv == response.body.rows[i].server_az) {
+                            flag = true
+                        }
+                    }
+                    expect(flag).to.eq(true)
+                })
+            }
+        })
+
+        cy.get('#nuviad-exchange-minute-qps-by-server-card > .card-body > .p-2 > .col-sm-2 > .mb-3 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.css-11unzgr').contains('6').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=6`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('12').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=12`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('24').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=24`, Authorization)
+        cy.wait(5000)
+    }) */
+
+    it('Test Exchanges Minute QPS by country', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const qps = 120
+        cy.get('#nuviad-exchange-minute-qps-by-country-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(25000)
+        cy.get('#nuviad-exchange-minute-qps-by-country-card > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=3`, Authorization)
+        cy.get('.mb-3 > .form-control').clear()
+        cy.get('.mb-3 > .form-control').type(qps)
+        /* cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=3`)).then(response => {
+            for (let i = 0; i < response.body.rows.length / 2; i++) {
+                cy.get('#nuviad-exchange-minute-qps-by-country-card').find('.recharts-legend-item-text').then($el => {
+                    let flag = true
+                    for (let j = 0; j < $el.length; j++) {
+                        let country = $el.eq(j)
+                        country = country.text()
+                        cy.log(country + " " + response.body.rows[i].cc)
+                        if (country == response.body.rows[i].cc) {
+                            if (!response.body.rows[i].qps >= qps) {
+                                cy.log(response.body.rows[i].qps)
+                                
+                            }
+                        }
+                    }
+                    
+                })
+            }
+        }) */
+
+        cy.get('#nuviad-exchange-minute-qps-by-country-card > .card-body > .p-2 > .col-sm-2 > .mb-3 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.css-11unzgr').contains('6').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=6`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('12').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=12`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('24').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=24`, Authorization)
+        cy.wait(5000)
     })
 })
 
@@ -825,7 +944,7 @@ describe('Daily Campaign Performance', function () {
         cy.selectTableRows('10', 10, 3, '#nuviad-daily-campaigns-performance-card')
     })
 
-    
+
 
     it('Test date change', function () {
         const token = Cypress.env('token');
@@ -851,7 +970,7 @@ describe('Daily Campaign Performance', function () {
         })
 
     })
-}) 
+})
 
 
 describe('Daily exchanges requests', function () {
@@ -911,7 +1030,7 @@ describe('Daily exchanges requests', function () {
                             if(response.body.rows[i].exchange==response.body.related_entities.exchanges[t].id){
                                 cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(1)`).then($el => {
                                     if(response.body.related_entities.exchanges[t].name==$el.text()){
-                                        
+
                                         for(let k=2;k<=4;k++){
                                             cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(${k})`).then($element=>{
                                                 if(k==2){
@@ -921,7 +1040,7 @@ describe('Daily exchanges requests', function () {
                                                     let num=Number($element.text())
                                                     expect(num).to.eq(response.body.related_entities.exchanges[t].num)
                                                 }
-                                                
+
                                             })
                                         }
                                         cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j+1}) > .sorting_1`).then($req=>{
@@ -933,7 +1052,7 @@ describe('Daily exchanges requests', function () {
                                 })
                             }
                         }
-                        
+
 
                     }
                 }
