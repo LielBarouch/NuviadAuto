@@ -14,13 +14,13 @@ describe('Login Admin dashboard', function () {
     })
 
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.HubzityAdminDashboard}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.hubzity.com/dashboard/')
         cy.wait(20000)
 
     })
@@ -28,18 +28,18 @@ describe('Login Admin dashboard', function () {
         cy.get('.avatar-initial').click({force:true})
         cy.get('.dropdown-item').click({force:true})
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.url().should('eq',`${this.data.HubzityAdminDashboard}/login/`)
     })
     it('Login again', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.hubzity.com/dashboard/')
         cy.wait(6000)
 
     }) */
 })
-describe('Stats and APIs tests', function () {
+/* describe('Stats and APIs tests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -180,8 +180,7 @@ describe('Test transactions table', function () {
         cy.get('#nuviad-billing-transactions-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
         cy.wait(12000)
         const downloadsFolder = Cypress.config("downloadsFolder");
-        cy.readFile(path.join(downloadsFolder, `Transactions - page 1.csv`)).should("exist")
-        
+        cy.readFile(path.join(downloadsFolder, `Transactions - page 1.csv`)).should("exist");
     })
 })
 
@@ -306,9 +305,8 @@ describe('Test transactions table', function () {
         cy.get(':nth-child(1) > .col-sm-10').then($el=>{
             expect($el.text()).to.eq(searchActor)
         })
-        cy.get('.modal-footer > .btn').click()
     })
-})
+}) */
 
 /* describe('Test credit request approving process', function () {
     beforeEach(function () {
@@ -333,14 +331,14 @@ describe('Test transactions table', function () {
         })
     })
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.HubzityAdminDashboard}/login`)
         cy.wait(10000)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.hubzity.com/dashboard/')
         cy.wait(20000)
         cy.log(initCredit)
     })
@@ -402,13 +400,13 @@ describe('Test credit request rejecting process', function () {
         })
     })
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.HubzityAdminDashboard}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.hubzity.com/dashboard/')
         cy.wait(20000)
         cy.log(initCredit)
     })
@@ -445,13 +443,13 @@ describe('Test credit request rejecting process', function () {
         })
     })
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.HubzityAdminDashboard}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.hubzity.com/dashboard/')
         cy.wait(20000)
         
     })
@@ -477,7 +475,7 @@ describe('Charts', function () {
         }
         return apiToTest
     }
-    it('Check actors names in Wins per minutes chart',function(){
+    /* it('Check actors names in Wins per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
         cy.wait(7000)
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > span').then($updated=>{
@@ -596,27 +594,27 @@ describe('Charts', function () {
         cy.get('.col-sm-4 > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
         cy.get('.css-11unzgr').contains('Beachfront').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_sQcqbo4KvZ/minute_traffic?hours=72`,Authorization)
-    })
+    }) */
     it('Check if Exchange minute traffice chart is visable to non-admin user',function(){
         cy.get('.avatar-initial').click({force:true})
         cy.get('.dropdown-item').click({force:true})
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.url().should('eq',`${this.data.HubzityAdminDashboard}/login/`)
         cy.wait(3000)
-        cy.AdminLogin("stg-admin@nuviad.com", "qwerty123")
+        cy.AdminLogin("aroma11@gmail.com", "sivan")
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.hubzity.com/dashboard/')
         cy.wait(10000)
         cy.get('#nuviad-exchange-minute-traffic-card').should('not.exist')
         cy.get('.avatar-initial').click({force:true})
         cy.get('.dropdown-item').click({force:true})
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.url().should('eq',`${this.data.HubzityAdminDashboard}/login/`)
         cy.wait(3000)
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.hubzity.com/dashboard/')
         cy.wait(10000)
     })
 

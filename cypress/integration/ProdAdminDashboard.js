@@ -14,13 +14,13 @@ describe('Login Admin dashboard', function () {
     })
 
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.ADMIN_PROD_URL}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(20000)
 
     })
@@ -28,13 +28,13 @@ describe('Login Admin dashboard', function () {
         cy.get('.avatar-initial').click({force:true})
         cy.get('.dropdown-item').click({force:true})
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.url().should('eq',`${this.data.ADMIN_PROD_URL}/login/`)
     })
     it('Login again', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(6000)
 
     }) */
@@ -180,8 +180,7 @@ describe('Test transactions table', function () {
         cy.get('#nuviad-billing-transactions-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
         cy.wait(12000)
         const downloadsFolder = Cypress.config("downloadsFolder");
-        cy.readFile(path.join(downloadsFolder, `Transactions - page 1.csv`)).should("exist")
-        
+        cy.readFile(path.join(downloadsFolder, `Transactions - page 1.csv`)).should("exist");
     })
 })
 
@@ -306,7 +305,6 @@ describe('Test transactions table', function () {
         cy.get(':nth-child(1) > .col-sm-10').then($el=>{
             expect($el.text()).to.eq(searchActor)
         })
-        cy.get('.modal-footer > .btn').click()
     })
 })
 
@@ -333,14 +331,14 @@ describe('Test transactions table', function () {
         })
     })
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.ADMIN_PROD_URL}/login`)
         cy.wait(10000)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(20000)
         cy.log(initCredit)
     })
@@ -402,13 +400,13 @@ describe('Test credit request rejecting process', function () {
         })
     })
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.ADMIN_PROD_URL}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(20000)
         cy.log(initCredit)
     })
@@ -445,19 +443,19 @@ describe('Test credit request rejecting process', function () {
         })
     })
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.ADMIN_PROD_URL}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(20000)
         
     })
 }) */
 
-describe('Charts', function () {
+/* describe('Charts', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -597,26 +595,36 @@ describe('Charts', function () {
         cy.get('.css-11unzgr').contains('Beachfront').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_sQcqbo4KvZ/minute_traffic?hours=72`,Authorization)
     })
-    it('Check if Exchange minute traffice chart is visable to non-admin user',function(){
+
+    it('Logout',function(){
         cy.get('.avatar-initial').click({force:true})
         cy.get('.dropdown-item').click({force:true})
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.url().should('eq',`${this.data.ADMIN_PROD_URL}/login/`)
         cy.wait(3000)
+    })
+
+    it('Check if Exchange minute traffice chart is visable to non-admin user',function(){
+        cy.getToken("stg-admin@nuviad.com", "qwerty123")
         cy.AdminLogin("stg-admin@nuviad.com", "qwerty123")
         cy.get('.btn-brand-02').click()
-
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(10000)
-        cy.get('#nuviad-exchange-minute-traffic-card').should('not.exist')
+        cy.get('#nuviad-exchange-minute-traffic-card').should('not.exist')  
+    })
+
+    it('Logout',function(){
         cy.get('.avatar-initial').click({force:true})
         cy.get('.dropdown-item').click({force:true})
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.url().should('eq',`${this.data.ADMIN_PROD_URL}/login/`)
         cy.wait(3000)
+    })
+
+    it('Login',function(){
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(10000)
     })
 
@@ -711,9 +719,9 @@ describe('Charts', function () {
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=24`, Authorization)
         cy.wait(5000)
     })
-})
+}) */
 
-describe('Daily actors spend', function () {
+/* describe('Daily actors spend', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -837,10 +845,10 @@ describe('Daily actors spend', function () {
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Daily actor spend ${yesterday.format('DD_MM_YYYY')}.csv`)).should("exist");
     })
-})
+}) */
 
 
-describe('Daily exchanges spend', function () {
+/* describe('Daily exchanges spend', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -961,9 +969,9 @@ describe('Daily exchanges spend', function () {
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Daily exchanges spend ${yesterday.format('DD_MM_YYYY')}.csv`)).should("exist");
     })
-})
+}) */
 
-describe('Daily Campaign Performance', function () {
+/* describe('Daily Campaign Performance', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -1029,10 +1037,10 @@ describe('Daily Campaign Performance', function () {
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Daily campaign performance ${yesterday.format('DD_MM_YYYY')}.csv`)).should("exist");
     })
-})
+}) */
 
 
-describe('Daily exchanges requests', function () {
+/* describe('Daily exchanges requests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -1128,4 +1136,4 @@ describe('Daily exchanges requests', function () {
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Daily exchanges requests ${yesterday.format('DD_MM_YYYY')}.csv`)).should("exist");
     })
-})
+}) */
