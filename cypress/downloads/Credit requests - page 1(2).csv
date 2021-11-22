@@ -1,6 +1,0 @@
-"Account","Status","created_at","updated_at","Amount","Currency","Notes","Id","Requester"
-"actor_TPrgTKLaeL4qNVuNliGsqwe9imAzB","PENDING","21/11/2021","21/11/2021",20,"USD","test","619a1f355c5c50000835e91a","60fd383c4be8c800111690d9"
-"actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO","PENDING","21/11/2021","21/11/2021",-50,"USD","Automation test","619a02019dec5300087aa0be","60fd383c4be8c800111690d9"
-"actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO","PENDING","04/10/2021","04/10/2021",500,"USD","ffdgdf","615ae781c6ffb00008b406f5","60fd383c4be8c800111690d9"
-"actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO","PENDING","26/09/2021","26/09/2021",1000,"USD","Automation test","615037e86c89c1000877f5cc","60fd383c4be8c800111690d9"
-"actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO","PENDING","19/09/2021","19/09/2021",10,"USD","test from UI","61470c47e00f37000928006f","5fe1d8260fe4c7001100178b"

@@ -39,7 +39,7 @@ describe('Login Admin dashboard', function () {
 
     }) */
 })
-describe('Stats and APIs tests', function () {
+/* describe('Stats and APIs tests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -105,9 +105,9 @@ describe('Stats and APIs tests', function () {
         })
     })
 
-})
+}) */
 
-describe('Test transactions table', function () {
+/* describe('Test transactions table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -183,9 +183,9 @@ describe('Test transactions table', function () {
         cy.readFile(path.join(downloadsFolder, `Transactions - page 1.csv`)).should("exist")
         
     })
-})
+}) */
 
- describe('Credit requests', function () {
+ /* describe('Credit requests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -308,14 +308,15 @@ describe('Test transactions table', function () {
         })
         cy.get('.modal-footer > .btn').click()
     })
-})
+}) */
 
 /* describe('Test credit request approving process', function () {
+    
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
         })
-        cy.getToken("liel@nuviad.com", "lb123456")
+        cy.getToken('liel@nuviad.com', 'lb123456')
     })
     it('Login to dashboard', function () {
         cy.visit(`${this.data.NuviadDashboard}/login/#`)
@@ -333,10 +334,12 @@ describe('Test transactions table', function () {
         })
     })
     it('Enter to the admin dashboard login', function () {
+        
         cy.visit(`${this.data.NuviadAdminDashboard}/login`)
         cy.wait(10000)
     })
     it('Login', function () {
+        
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
@@ -347,7 +350,7 @@ describe('Test transactions table', function () {
     it('Create credit request', function () {
         cy.get('#nuviad-credit-request-card > .align-items-center > .d-flex > :nth-child(1) > .sc-bdVaJa').click()
         cy.get('form > .row > :nth-child(1) > .form-group > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
-        cy.get('.form-group > .css-2b097c-container').type('Patternz')
+        cy.get('[style="transform: none; width: 711px; height: 29px; position: absolute; z-index: 2147483647; background-color: rgb(159, 196, 231); top: -4105.58px; left: 626px;"]').type('Patternz')
         cy.get('.css-11unzgr').contains('Patternz (sivangrisario@gmail.com)').click()
         cy.get('#amount').clear()
         cy.get('#amount').type(1000)
@@ -669,8 +672,8 @@ describe('Charts', function () {
             expect($updated.text()).to.eq('just now')
         })
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=3`, Authorization)
-        cy.get('.mb-3 > .form-control').clear()
-        cy.get('.mb-3 > .form-control').type(qps)
+        cy.get('#nuviad-exchange-minute-qps-by-country-card > .card-body > .p-2 > :nth-child(1) > .mb-3 > .form-control').clear()
+        cy.get('#nuviad-exchange-minute-qps-by-country-card > .card-body > .p-2 > :nth-child(1) > .mb-3 > .form-control').type(qps)
         cy.get('#nuviad-exchange-minute-qps-by-country-card').find('.recharts-legend-item-text').then($el => {
             let flag = true
 
@@ -711,8 +714,50 @@ describe('Charts', function () {
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=24`, Authorization)
         cy.wait(5000)
     })
-})
 
+    it('Test Minute Conversions',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-per-minute-card-conversions > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(20000)
+        cy.get('#nuviad-per-minute-card-conversions > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        cy.get('#nuviad-per-minute-card-conversions > .card-body > .p-2 > .col-sm-2 > .mb-3 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.css-11unzgr').contains('6').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=6&stage=0`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('12').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=12&stage=0`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('24').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`, Authorization)
+        cy.wait(5000)
+        cy.get('#nuviad-per-minute-card-conversions').find('.recharts-legend-item-text').then($el => {
+            let flag=false
+            for (let i = 0; i < $el.length; i++) {
+                let actors = $el.eq(i)
+                actors = actors.text()
+                cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`)).then(response => {
+                    for (let j = 0; j < response.body.related_entities.accounts.length; j++) {
+                        if(actors==response.body.related_entities.accounts[j].name){
+                            for(let k=0;k<response.body.rows.length;k++){
+                                if(response.body.rows[k].actor_id==response.body.related_entities.accounts[j].id){
+                                    expect(actors).to.eq(response.body.related_entities.accounts[j].name)
+                                }
+                            }
+                        }
+                    }
+                })
+
+            }
+            
+        })
+    })
+})
+/*
 describe('Daily actors spend', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -1129,3 +1174,4 @@ describe('Daily exchanges requests', function () {
         cy.readFile(path.join(downloadsFolder, `Daily exchanges requests ${yesterday.format('DD_MM_YYYY')}.csv`)).should("exist");
     })
 })
+*/
