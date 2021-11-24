@@ -1,5 +1,11 @@
 /// <reference types="Cypress" />
 
+const testActor = {
+    id: 'actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO',
+    name: 'Patternz',
+    newMargin: Math.floor(Math.random() * 101)
+}
+
 describe('Login to admin dashboard', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -40,7 +46,7 @@ describe('Accounts section', function () {
     })
 })
 
-describe('Test pending accounts table', function () {
+/* describe('Test pending accounts table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -156,9 +162,66 @@ describe('Test pending accounts table', function () {
     it('Views today sorting', function () {
         accountsSorting(7, `${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=views_today`, `${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=-views_today`)
     })
+}) */
+
+describe('Test margin set', function () {
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function getAccountsApi(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Set margin for an actor with wrong values', function () {
+        const negativeValue=-1
+        const overValue=200
+        cy.get('label > input').type(testActor.id)
+        cy.wait(4000)
+        cy.get(':nth-child(5) > .svg-inline--fa').click()
+        cy.get('#margin').clear()
+        cy.get('#margin').type(negativeValue)
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.get('.invalid-feedback').then($invalidError => {
+            cy.wrap($invalidError).should('be.visible')
+            expect($invalidError.text()).to.eq('Minimum margin is 0')
+        })
+        cy.get('#margin').clear()
+        cy.get('#margin').type(overValue)
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.get('.invalid-feedback').then($invalidError => {
+            cy.wrap($invalidError).should('be.visible')
+            expect($invalidError.text()).to.eq('Maximum margin is 100')
+        })
+    })
+
+    it('Set margin for an actor', function () {
+        cy.get('#margin').clear()
+        cy.get('#margin').type(testActor.newMargin)
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(4000)
+    })
+    
+    it('Check margin API load',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        
+    })
 })
 
-describe('Create credit request through accounts table', function () {
+/* describe('Create credit request through accounts table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -215,9 +278,9 @@ describe('Create credit request through accounts table', function () {
         cy.wait(6000)
     })
 
-})
+}) */
 
-describe('Allowed features', function () {
+/* describe('Allowed features', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -559,4 +622,4 @@ describe('Allowed features', function () {
         cy.get('fieldset > .filled > .form-control').should('not.exist')
         cy.get('.col-lg-10').contains('Placements Targeting').should('not.exist')
     })
-})
+}) */
