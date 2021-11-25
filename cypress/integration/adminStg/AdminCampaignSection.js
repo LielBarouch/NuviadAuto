@@ -2,8 +2,7 @@
 const dayjs = require('dayjs')
 const testActorId = 'actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO'
 const testActorName = 'Patternz'
-const token = Cypress.env('token');
-const Authorization = token;
+
 const searchWord = 'flight'
 
 const campToSearch = {
@@ -117,6 +116,8 @@ describe('Campaign section', function () {
     })
 
      it('Refreshing the table', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
         cy.get('.sc-bdVaJa').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/campaigns?owner_id=${testActorId}`, Authorization)
     })

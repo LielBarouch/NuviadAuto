@@ -185,6 +185,20 @@ describe('Test margin set', function () {
         return apiToTest
     }
 
+    function getCampaignsApi(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
     it('Set margin for an actor with wrong values', function () {
         const negativeValue=-1
         const overValue=200
@@ -211,13 +225,44 @@ describe('Test margin set', function () {
         cy.get('#margin').clear()
         cy.get('#margin').type(testActor.newMargin)
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
-        cy.wait(4000)
+        cy.wait(5000)
     })
     
     it('Check margin API load',function(){
         const token = Cypress.env('token');
         const Authorization = token;
-        
+        cy.request(getAccountsApi(`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=-created_at&q=${testActor.id}`)).then(response=>{
+            expect(response.body.rows[0].margin).to.eq(testActor.newMargin)
+        })
+    })
+
+    it('Check margin for all campaigns for this actor',function(){
+        cy.get(':nth-child(5) > .nav-link').click()
+        cy.wait(5000)
+        cy.get('.css-1hwfws3').click()
+        cy.get('.css-1pahdxg-control').type(testActor.name)
+        cy.get('.css-11unzgr').contains('Patternz (sivangrisario@gmail.com)').click()
+        cy.selectTableRows('100', 100, 0, '#nuviad-campaigns-card')
+        cy.wait(3000)
+        cy.get('tbody > tr').then($tableRows => {
+            for (let j = 1; j <= $tableRows.length; j++) {
+                cy.get(`tbody > :nth-child(${j}) > :nth-child(6)`).then($margin => {
+                    const margin=Number($margin.text())
+                    expect(margin*100).to.eq(testActor.newMargin)
+                })
+            }
+        })
+        cy.request(getCampaignsApi(`${this.data.API_BASE_URL}/admin/campaigns?owner_id=${testActor.id}`)).then(response=>{
+            for (let i = 0; i < response.body.length; i++){
+                expect((response.body[i].margin)*100).to.eq(testActor.newMargin)
+            }
+        })
+    })
+
+    it('Enter Exchanges section', function () {
+        cy.get(':nth-child(3) > .nav-link').click()
+        cy.wait(3000)
+
     })
 })
 
