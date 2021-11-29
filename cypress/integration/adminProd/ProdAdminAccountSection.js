@@ -1,5 +1,11 @@
 /// <reference types="Cypress" />
 
+const testActor = {
+    id: 'actor_QVAJjkxL4ldx4P6zF8DsgMKfqKQJO',
+    name: 'Patternz',
+    newMargin: Math.floor(Math.random() * 101)
+}
+
 describe('Login to admin dashboard', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -158,6 +164,109 @@ describe('Accounts section', function () {
     })
 })
  */
+
+describe('Test margin set', function () {
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function getAccountsApi(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    function getCampaignsApi(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Set margin for an actor with wrong values', function () {
+        const negativeValue=-1
+        const overValue=200
+        cy.get('label > input').type(testActor.id)
+        cy.wait(4000)
+        cy.get(':nth-child(5) > .svg-inline--fa').click()
+        cy.get('#margin').clear()
+        cy.get('#margin').type(negativeValue)
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.get('.invalid-feedback').then($invalidError => {
+            cy.wrap($invalidError).should('be.visible')
+            expect($invalidError.text()).to.eq('Minimum margin is 0')
+        })
+        cy.get('#margin').clear()
+        cy.get('#margin').type(overValue)
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.get('.invalid-feedback').then($invalidError => {
+            cy.wrap($invalidError).should('be.visible')
+            expect($invalidError.text()).to.eq('Maximum margin is 100')
+        })
+    })
+
+    it('Set margin for an actor', function () {
+        cy.get('#margin').clear()
+        cy.get('#margin').type(testActor.newMargin)
+        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
+        cy.wait(5000)
+    })
+    
+    it('Check margin API load',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.request(getAccountsApi(`${this.data.API_BASE_URL}/admin/accounts/?limit=10&offset=0&sort=-created_at&q=${testActor.id}`)).then(response=>{
+            expect(response.body.rows[0].margin).to.eq(testActor.newMargin)
+        })
+    })
+
+    it('Check margin for all campaigns for this actor',function(){
+        cy.get(':nth-child(5) > .nav-link').click()
+        cy.wait(5000)
+        cy.get('.css-1hwfws3').click()
+        cy.get('.css-1pahdxg-control').type(testActor.name)
+        cy.get('.css-11unzgr').contains('Patternz (sivangrisario@gmail.com)').click()
+        cy.selectTableRows('100', 100, 0, '#nuviad-campaigns-card')
+        cy.wait(3000)
+        cy.get('tbody > tr').then($tableRows => {
+            for (let j = 1; j <= $tableRows.length; j++) {
+                cy.get(`tbody > :nth-child(${j}) > :nth-child(6)`).then($margin => {
+                    const margin=Number($margin.text())
+                    expect(margin*100).to.eq(testActor.newMargin)
+                })
+            }
+        })
+        cy.request(getCampaignsApi(`${this.data.API_BASE_URL}/admin/campaigns?owner_id=${testActor.id}`)).then(response=>{
+            for (let i = 0; i < response.body.length; i++){
+                expect((response.body[i].margin)*100).to.eq(testActor.newMargin)
+            }
+        })
+    })
+
+    it('Enter Exchanges section', function () {
+        cy.get(':nth-child(3) > .nav-link').click()
+        cy.wait(3000)
+
+    })
+})
+
 /* describe('Create credit request through accounts table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -217,7 +326,7 @@ describe('Accounts section', function () {
 
 })
  */
-describe('Allowed features', function () {
+/* describe('Allowed features', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -234,27 +343,27 @@ describe('Allowed features', function () {
         cy.wait(3000)
     })
     it('Open the allowed features modal', function () {
-        cy.get('.btn-group > :nth-child(6) > svg').click()
+        cy.get('.btn-group > :nth-child(8) > svg').click()
     })
     it('Allow Use JS tags, Vast tags, Create video ad, Landing pages, Audience segments, GEO traps,Targeting lists,Frequency Cap and Campaigns bulk update', function () {
         cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
-        cy.get('#react-select-7-option-1').click()
+        cy.contains('Use JS Tags').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-2').click()
+        cy.contains('Use VAST Tags').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-10').click()
+        cy.contains('Display campaign frequency cap in table').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-20').click()
+        cy.contains('Create video ads').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-21').click()
+        cy.contains('Campaigns bulk update').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-27').click()
+        cy.contains('Targeting lists').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-35').click()
+        cy.contains('Landing pages').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-7').click()
+        cy.contains('GEO Traps').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-32').click()
+        cy.contains('Audience segments').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(20000)
     })
@@ -302,7 +411,7 @@ describe('Allowed features', function () {
         cy.wait(3000)
     })
     it('Open the allowed features modal', function () {
-        cy.get('.btn-group > :nth-child(6) > svg').click()
+        cy.get('.btn-group > :nth-child(8) > svg').click()
     })
     it('Disable Use JS tags, Vast tags, Create video ad, Landing pages, Audience segments, GEO traps,Targeting lists,Frequency Cap and Campaigns bulk update', function () {
         cy.get(':nth-child(1) > .css-19bqh2r').click()
@@ -350,29 +459,29 @@ describe('Allowed features', function () {
         cy.wait(3000)
     })
     it('Open the allowed features modal', function () {
-        cy.get('.btn-group > :nth-child(6) > svg').click()
+        cy.get('.btn-group > :nth-child(8) > svg').click()
     })
     it('Allow ZipCode targeting, Account labels, Allow setting campaign learning attributes, Retargeting, Campaign cpc goal Apps targeting users Age targeting and Gender targeting', function () {
         cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
-        cy.get('#react-select-7-option-25').click()
+        cy.contains('Zip codes targeting').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-24').click()
+        cy.contains('Campaign auction type').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-29').click()
+        cy.contains('Campaign frequency cap cooldown').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-30').click()
+        cy.contains('Campaign user gender targeting').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-31').click()
+        cy.contains('Campaign user age targeting').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-23').click()
+        cy.contains('Account labels').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-3').click()
+        cy.contains('Apps targeting users').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-6').click()
+        cy.contains('Allow setting campaign learning attributes').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-14').click()
+        cy.contains('Retargeting').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-16').click()
+        cy.contains('Campaign cpc goal').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(20000)
     })
@@ -419,7 +528,7 @@ describe('Allowed features', function () {
         cy.wait(3000)
     })
     it('Open the allowed features modal', function () {
-        cy.get('.btn-group > :nth-child(6) > svg').click()
+        cy.get('.btn-group > :nth-child(8) > svg').click()
     })
     it('Disable ZipCode targeting, Account labels, Allow setting campaign learning attributes, Retargeting, Campaign cpc goal Apps targeting users Age targeting and Gender targeting', function () {
         cy.get(':nth-child(1) > .css-19bqh2r').click()
@@ -470,25 +579,25 @@ describe('Allowed features', function () {
         cy.wait(3000)
     })
     it('Open the allowed features modal', function () {
-        cy.get('.btn-group > :nth-child(6) > svg').click()
+        cy.get('.btn-group > :nth-child(8) > svg').click()
     })
     it('Allow Target google billing id, Target app rank, RTB campaign configuration, Impression delivery limit, Allow quick spend, Enable option to set click to chat, Click to call and Campaign placements targeting', function () {
         cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
-        cy.get('#react-select-7-option-34').click()
+        cy.contains('RTB campaign configuration').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-26').click()
+        cy.contains('Target app rank').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-18').click()
+        cy.contains('Target google billing id').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-4').click()
+        cy.contains('Allow quick spend').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-17').click()
+        cy.contains('Impression delivery limit').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-12').click()
+        cy.contains('Enable option to set click to chat').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-15').click()
+        cy.contains('Click to call').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
-        cy.get('#react-select-7-option-9').click()
+        cy.contains('Campaign placements targeting').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(20000)
     })
@@ -533,7 +642,7 @@ describe('Allowed features', function () {
         cy.wait(3000)
     })
     it('Open the allowed features modal', function () {
-        cy.get('.btn-group > :nth-child(6) > svg').click()
+        cy.get('.btn-group > :nth-child(8) > svg').click()
     })
     it('Disable Target google billing id, Target app rank, RTB campaign configuration, Impression delivery limit, Allow quick spend, Enable option to set click to chat, Click to call and Campaign placements targeting', function () {
         cy.get(':nth-child(1) > .css-19bqh2r').click()
@@ -557,4 +666,4 @@ describe('Allowed features', function () {
         cy.get('fieldset > .filled > .form-control').should('not.exist')
         cy.get('.col-lg-10').contains('Placements Targeting').should('not.exist')
     })
-})
+}) */

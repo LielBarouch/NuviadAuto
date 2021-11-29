@@ -107,7 +107,7 @@ describe('Stats and APIs tests', function () {
 
 })
 
-describe('Test transactions table', function () {
+/* describe('Test transactions table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -182,9 +182,9 @@ describe('Test transactions table', function () {
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Transactions - page 1.csv`)).should("exist");
     })
-})
+}) */
 
- describe('Credit requests', function () {
+/*  describe('Credit requests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -306,7 +306,7 @@ describe('Test transactions table', function () {
             expect($el.text()).to.eq(searchActor)
         })
     })
-})
+}) */
 
 /* describe('Test credit request approving process', function () {
     beforeEach(function () {
@@ -455,7 +455,7 @@ describe('Test credit request rejecting process', function () {
     })
 }) */
 
-/* describe('Charts', function () {
+describe('Charts', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -475,7 +475,7 @@ describe('Test credit request rejecting process', function () {
         }
         return apiToTest
     }
-    it('Check actors names in Wins per minutes chart',function(){
+    /* it('Check actors names in Wins per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
         cy.wait(7000)
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > span').then($updated=>{
@@ -718,8 +718,50 @@ describe('Test credit request rejecting process', function () {
         cy.get('.css-11unzgr').contains('24').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=24`, Authorization)
         cy.wait(5000)
+    }) */
+
+    it('Test Minute Conversions',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-per-minute-card-conversions > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(20000)
+        cy.get('#nuviad-per-minute-card-conversions > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        cy.get('#nuviad-per-minute-card-conversions > .card-body > .p-2 > .col-sm-2 > .mb-3 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.css-11unzgr').contains('6').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=6&stage=0`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('12').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=12&stage=0`, Authorization)
+        cy.wait(5000)
+        cy.get('.css-1pahdxg-control').click()
+        cy.get('.css-11unzgr').contains('24').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`, Authorization)
+        cy.wait(5000)
+        cy.get('#nuviad-per-minute-card-conversions').find('.recharts-legend-item-text').then($el => {
+            let flag=false
+            for (let i = 0; i < $el.length; i++) {
+                let actors = $el.eq(i)
+                actors = actors.text()
+                cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`)).then(response => {
+                    for (let j = 0; j < response.body.related_entities.accounts.length; j++) {
+                        if(actors==response.body.related_entities.accounts[j].name){
+                            for(let k=0;k<response.body.rows.length;k++){
+                                if(response.body.rows[k].actor_id==response.body.related_entities.accounts[j].id){
+                                    expect(actors).to.eq(response.body.related_entities.accounts[j].name)
+                                }
+                            }
+                        }
+                    }
+                })
+
+            }
+            
+        })
     })
-}) */
+})
 
 /* describe('Daily actors spend', function () {
     beforeEach(function () {

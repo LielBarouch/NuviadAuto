@@ -21,7 +21,7 @@ describe('Login Admin dashboard', function () {
         cy.get('.btn-brand-02').click()
 
         cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
-        cy.wait(20000)
+        cy.wait(30000)
 
     })
     /* it('Logout',function(){
@@ -480,9 +480,9 @@ describe('Charts', function () {
         }
         return apiToTest
     }
-    it('Check actors names in Wins per minutes chart',function(){
+    /* it('Check actors names in Wins per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
-        cy.wait(7000)
+        cy.wait(8000)
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > span').then($updated=>{
             expect($updated.text()).to.eq('just now')
         })
@@ -508,7 +508,7 @@ describe('Charts', function () {
     })
     it('Check actors names in Clicks per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-clicks > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
-        cy.wait(5000)
+        cy.wait(8000)
         cy.get('#nuviad-per-minute-card-clicks > .align-items-center > .d-flex > span').then($updated=>{
             expect($updated.text()).to.eq('just now')
         })
@@ -535,7 +535,7 @@ describe('Charts', function () {
     })
     it('Check actors names in Spend per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-spend > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
-        cy.wait(5000)
+        cy.wait(8000)
         cy.get('#nuviad-per-minute-card-spend > .align-items-center > .d-flex > span').then($updated=>{
             expect($updated.text()).to.eq('just now')
         })
@@ -558,7 +558,7 @@ describe('Charts', function () {
                 cy.wrap(compCount).should('eq',actorsLenght)
             })
         })
-    })
+    }) */
 
     it('Exchange minute traffice chart' ,{retries:3},function(){
         const token = Cypress.env('token');
@@ -596,7 +596,7 @@ describe('Charts', function () {
         cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
         cy.get('.css-11unzgr').contains('72').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=72`,Authorization)
-        cy.get('.col-sm-4 > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
+        cy.get('#nuviad-exchange-minute-traffic-card > .card-body > .p-2 > .col-sm-4 > .css-2b097c-container > .css-yk16xz-control').click()
         cy.get('.css-11unzgr').contains('Beachfront').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_sQcqbo4KvZ/minute_traffic?hours=72`,Authorization)
     })
