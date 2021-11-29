@@ -467,7 +467,7 @@ describe('Charts', function () {
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function getMinApi(urlToTest) {
+    function getAPI(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
@@ -494,7 +494,7 @@ describe('Charts', function () {
             for(let i=0;i<actorsLenght;i++){
                 actorsArr[i]=$el.eq(i).text()
             }
-            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+            cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
                 for(let i=0;i<actorsArr.length;i++){
                     for(let j=0;j<response.body.related_entities.accounts.length;j++){
                         if(actorsArr[i]==response.body.related_entities.accounts[j].name){
@@ -521,7 +521,7 @@ describe('Charts', function () {
                 actorsArr[i]=$el.eq(i).text()
                 cy.log(actorsArr[i])
             }
-            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+            cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
                 for(let i=0;i<actorsArr.length;i++){
                     for(let j=0;j<response.body.related_entities.accounts.length;j++){
                         if(actorsArr[i]==response.body.related_entities.accounts[j].name){
@@ -547,7 +547,7 @@ describe('Charts', function () {
             for(let i=0;i<actorsLenght;i++){
                 actorsArr[i]=$el.eq(i).text()
             }
-            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+            cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
                 for(let i=0;i<actorsArr.length;i++){
                     for(let j=0;j<response.body.related_entities.accounts.length;j++){
                         if(actorsArr[i]==response.body.related_entities.accounts[j].name){
@@ -560,7 +560,7 @@ describe('Charts', function () {
         })
     }) */
 
-    it('Exchange minute traffice chart' ,{retries:3},function(){
+    /* it('Exchange minute traffice chart' ,{retries:3},function(){
         const token = Cypress.env('token');
         const Authorization = token;
         cy.get('#nuviad-exchange-minute-traffic-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
@@ -632,7 +632,7 @@ describe('Charts', function () {
             expect($updated.text()).to.eq('just now')
         })
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`, Authorization)
-        cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`)).then(response => {
+        cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`)).then(response => {
             for (let i = 0; i < response.body.rows.length / 2; i++) {
                 cy.get('#nuviad-exchange-minute-qps-by-server-card').find('.recharts-legend-item-text').then($el => {
                     let flag = false
@@ -681,7 +681,7 @@ describe('Charts', function () {
             for (let i = 0; i < $el.length; i++) {
                 let country = $el.eq(i)
                 country = country.text()
-                cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=3`)).then(response => {
+                cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=3`)).then(response => {
                     for (let j = 0; j < response.body.rows.length; j++) {
                         if (country == response.body.rows[j].cc) {
                             if (response.body.rows[j].qps >= qps) {
@@ -740,7 +740,7 @@ describe('Charts', function () {
             for (let i = 0; i < $el.length; i++) {
                 let actors = $el.eq(i)
                 actors = actors.text()
-                cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`)).then(response => {
+                cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`)).then(response => {
                     for (let j = 0; j < response.body.related_entities.accounts.length; j++) {
                         if(actors==response.body.related_entities.accounts[j].name){
                             for(let k=0;k<response.body.rows.length;k++){
@@ -755,6 +755,39 @@ describe('Charts', function () {
             }
             
         })
+    }) */
+
+    it('Exchange by Country',function(){
+        const countryCode='ISR'
+        const country='Israel'
+        let count=0
+        cy.get('#nuviad-exchange-country-qps-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({force:true})
+        cy.wait(10000)
+        cy.get('#nuviad-exchange-country-qps-card > .pt-3 > :nth-child(1) > .col-lg-4 > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
+        cy.get('.css-1pahdxg-control').type(countryCode)
+        cy.get('.css-11unzgr').contains(country).click()
+        cy.wait(4000)
+        cy.get('#nuviad-exchange-country-qps-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Exchange by country ${country}.csv`)).should("exist");
+        cy.request(getAPI(`${this.data.API_BASE_URL}//admin/stats/exchanges/country/qps?cc=${countryCode}`)).then(response=>{
+            cy.get('#nuviad-exchange-country-qps-table > .dataTables_wrapper > .table > tbody > tr').then($tableRows=>{
+                for(let i=1;i<=$tableRows.length;i++){
+                    for(let j=0;j<response.body.related_entities.exchanges.length;j++){
+                        cy.get(`#nuviad-exchange-country-qps-table > .dataTables_wrapper > .table > tbody > :nth-child(${i}) > :nth-child(1)`).then($exName=>{
+                            if($exName.text()==response.body.related_entities.exchanges[j].name){
+                                count++
+                            }
+                        })
+                    }
+                }
+                cy.log(count).then(()=>{
+                    expect(count).to.eq($tableRows.length)
+                })
+            })
+        })
+        
     })
 })
 /*
