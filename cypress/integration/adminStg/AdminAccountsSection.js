@@ -164,7 +164,7 @@ describe('Accounts section', function () {
     })
 }) */
 
-describe('Test margin set', function () {
+/* describe('Test margin set', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -264,7 +264,7 @@ describe('Test margin set', function () {
         cy.wait(3000)
 
     })
-})
+}) */
 
 /* describe('Create credit request through accounts table', function () {
     beforeEach(function () {
@@ -325,7 +325,7 @@ describe('Test margin set', function () {
 
 }) */
 
-/* describe('Allowed features', function () {
+describe('Allowed features', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -346,7 +346,7 @@ describe('Test margin set', function () {
     it('Open the allowed features modal', function () {
         cy.get(':nth-child(8) > svg').click()
     })
-    it('Allow Use JS tags, Vast tags, Create video ad, Landing pages, Audience segments, GEO traps,Targeting lists,Frequency Cap and Campaigns bulk update', function () {
+    it('Allow Use JS tags, Vast tags, Create video ad, Landing pages, Audience segments, GEO traps,Targeting lists,Frequency Cap, User ID in report and Campaigns bulk update', function () {
         cy.get('.form-group > .css-2b097c-container > .css-yk16xz-control').click()
         cy.contains('Use JS Tags').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
@@ -365,6 +365,8 @@ describe('Test margin set', function () {
         cy.contains('GEO Traps').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
         cy.contains('Audience segments').click()
+        cy.get('.css-1wy0on6 > :nth-child(3)').click()
+        cy.contains('Report show user id').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(20000)
     })
@@ -388,6 +390,11 @@ describe('Test margin set', function () {
         cy.get('.md-checkbox-column > .ng-scope > .md-container').click()
         cy.get(':nth-child(2) > .btn-group').click()
         cy.contains('Update campaigns').should('be.visible')
+        cy.get(':nth-child(3) > .menu-drop-content > :nth-child(1) > a').click()
+        cy.get('.btn').click()
+        cy.get('segments-selection > .Select > .Select-control').click()
+        cy.get('segments-selection > .Select > .Select-control').click()
+        cy.get('#react-select-3--list').contains('User ID').should('exist')
 
     })
     it('Login again to admin dashboard', function () {
@@ -436,6 +443,11 @@ describe('Test margin set', function () {
         cy.get('.md-checkbox-column > .ng-scope > .md-container').click()
         cy.get(':nth-child(2) > .btn-group').click()
         cy.contains('Update campaigns').should('not.exist')
+        cy.get(':nth-child(3) > .menu-drop-content > :nth-child(1) > a').click()
+        cy.get('.btn').click()
+        cy.get('segments-selection > .Select > .Select-control').click()
+        cy.get('segments-selection > .Select > .Select-control').click()
+        cy.get('#react-select-3--list').contains('User ID').should('not.exist')
     })
 
     it('Login again to admin dashboard', function () {
@@ -599,6 +611,7 @@ describe('Test margin set', function () {
         cy.contains('Click to call').click()
         cy.get('.css-1wy0on6 > :nth-child(3)').click()
         cy.contains('Campaign placements targeting').click()
+        
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(20000)
     })
@@ -667,4 +680,4 @@ describe('Test margin set', function () {
         cy.get('fieldset > .filled > .form-control').should('not.exist')
         cy.get('.col-lg-10').contains('Placements Targeting').should('not.exist')
     })
-}) */
+})

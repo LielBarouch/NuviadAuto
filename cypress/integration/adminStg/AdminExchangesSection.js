@@ -1,5 +1,6 @@
 /// <reference types="Cypress" />
 const dayjs = require('dayjs')
+const path = require("path");
 const searchWord = 'sivan test 4'
 let exchangeInfo = {
     status: '',
@@ -84,7 +85,7 @@ describe('Exchanges section', function () {
         cy.getToken("liel@nuviad.com", "lb123456")
     })
     it('Enter Exchanges section', function () {
-        cy.get(':nth-child(5) > .nav-link').click()
+        cy.get(':nth-child(6) > .nav-link').click()
         cy.wait(3000)
 
     })
@@ -96,7 +97,7 @@ describe('Exchanges section', function () {
     })
 })
 
-describe('Table tests', function () {
+/* describe('All exchanges table tests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -119,16 +120,16 @@ describe('Table tests', function () {
     function tableSort(col, apiUp, apiDown) {
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.get(`table>thead>tr> :nth-child(${col})`).click()
+        cy.get(`#nuviad-exchanges-table > .dataTables_wrapper >table>thead>tr> :nth-child(${col})`).click()
         cy.wait(3000)
         cy.checkApiLoad(apiUp, Authorization)
-        cy.get(`table>thead>tr> :nth-child(${col})`).click()
+        cy.get(`#nuviad-exchanges-table > .dataTables_wrapper >table>thead>tr> :nth-child(${col})`).click()
         cy.wait(3000)
         cy.checkApiLoad(apiDown, Authorization)
     }
 
     function rowsLimitSelect(selection,selectionToCompair,table) {
-        cy.get('select').select(selection)
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_length > label > select').select(selection)
         cy.wait(3000)
         cy.get(table).find('tbody>tr').then((rows) => {
             if (selectionToCompair == 100) {
@@ -141,7 +142,7 @@ describe('Table tests', function () {
     }
 
     it('Test table refreshing', function () {
-        cy.get(':nth-child(2) > .sc-bdVaJa').click()
+        cy.get('#nuviad-exchanges-card > .align-items-center > .d-flex > :nth-child(2) > .sc-bdVaJa').click({force:true})
         cy.wait(3000)
         const token = Cypress.env('token');
         const Authorization = token;
@@ -151,10 +152,11 @@ describe('Table tests', function () {
         const searchWord = 'test1'
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.get('input').type(searchWord)
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').type(searchWord)
+        cy.wait(3000)
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name&q=test1`, Authorization)
         cy.request(getExchangesApi(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name&q=test1`)).then(response => {
-            cy.get('.dataTables_info').should('contain.text', response.body.total_count + " entries")
+            cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_info').should('contain.text', response.body.total_count + " entries")
             for (let i = 1; i <= response.body.total_count; i++) {
                 cy.get(`:nth-child(${i}) > .sorting_1`).then($el => {
                     let exName = $el.text()
@@ -163,7 +165,7 @@ describe('Table tests', function () {
                 })
             }
         })
-        cy.get('input').clear()
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').clear()
         cy.wait(3000)
     })
     it('Table sorting test', function () {
@@ -179,24 +181,25 @@ describe('Table tests', function () {
     it('Pagination test',function(){
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.get('input').type('test')
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').type('test')
         cy.wait(3000)
-        cy.get('.paginate_button').then($el=>{
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_paginate').then($el=>{
             for(let i=2;i<$el.length-1;i++){
+                cy.log(i)
                 cy.get($el).eq(i).click()
                 cy.wait(3000)
                 cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=${i*10-10}&sort=-name&q=test`,Authorization)
             }           
         })
-        cy.get('input').clear()
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').clear()
     })
     it('Test actions',function(){
-        cy.get('input').type('sivan test')
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').type('sivan test')
         cy.wait(3000)
         cy.get(':nth-child(5) > :nth-child(5) > .btn-group > :nth-child(1) > svg').click()
         cy.get('.modal-content').should('be.visible')
         cy.get('.btn-secondary').click()
-        cy.get('input').clear()
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').clear()
     })
 })
 
@@ -225,7 +228,7 @@ describe('Test Exchanges modal and details',function(){
         const token = Cypress.env('token');
         const Authorization = token;
         
-        cy.get('input').type(searchWord)
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').type(searchWord)
         cy.wait(3000)
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/exchanges?limit=10&offset=0&sort=-name&q=${searchWord.replace(/\s/g,'+')}`,Authorization)
         cy.get('[d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"]').click({force:true})
@@ -304,7 +307,7 @@ describe('Test Exchanges modal and details',function(){
             }
         })
         cy.get('.btn-secondary').click()
-        cy.get('input').clear()
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').clear()
     })
 })
 
@@ -359,7 +362,7 @@ describe('Test active exchange in actor campaign', function () {
     it('Change exchange to active',function(){
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.get('input').type(searchWord)
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').type(searchWord)
         cy.wait(3000)
         cy.get('[d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"]').click({force:true})
         cy.get('.css-1hwfws3').click()
@@ -420,7 +423,7 @@ describe('Test active exchange in actor campaign', function () {
         cy.get('.btn-brand-02').click()
         cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
         cy.wait(10000)
-        cy.get(':nth-child(5) > .nav-link').click()
+        cy.get(':nth-child(6) > .nav-link').click()
         cy.wait(3000)
     })
 
@@ -476,7 +479,7 @@ describe('Test inactive exchanges in actor campaign',function(){
     it('Change exchange to inactive',function(){
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.get('input').type(searchWord)
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').type(searchWord)
         cy.wait(3000)
         cy.get('[d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"]').click({force:true})
         cy.get('.css-1hwfws3').click()
@@ -513,7 +516,7 @@ describe('Test inactive exchanges in actor campaign',function(){
         cy.get('.md-body > :nth-child(1) > :nth-child(3)').click()
         cy.wait(6000)
     })
-    it('Check exchanges', function () {
+    /* it('Check exchanges', function () {
         cy.request(getExchangesInDashboard(`${this.data.API_BASE_URL}/data_collections/exchanges`)).then(response => {
             let flag = false
             for (let i = 0; i < response.body.items.length; i++) {
@@ -528,14 +531,14 @@ describe('Test inactive exchanges in actor campaign',function(){
         cy.get('#ui-select-choices-2>li').then($el => {
             expect($el.text()).not.to.contain(searchWord)
         })
-    })
+    }) 
     it('Go back to exchanges section', function () {
         cy.visit(`${this.data.NuviadAdminDashboard}/login`)
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
         cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
         cy.wait(10000)
-        cy.get(':nth-child(5) > .nav-link').click()
+        cy.get(':nth-child(6) > .nav-link').click()
         cy.wait(3000)
     })
 })
@@ -596,7 +599,7 @@ describe('Create new exchange',function(){
     it('Check new exchange details',function(){
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.get('input').type(newExchange.exchangeName)
+        cy.get('#nuviad-exchanges-table > .dataTables_wrapper > .dataTables_filter > label > input').type(newExchange.exchangeName)
         cy.wait(3000)
         cy.get('[d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"]').click({force:true})
         cy.get('#name').should('contain.value',newExchange.exchangeName)
@@ -665,5 +668,283 @@ describe('Create new exchange',function(){
         }else{
             cy.get('#respectSecured').should('not.be.checked')
         }
+        cy.get('.btn-secondary').click()
+    })
+}) */
+
+/* describe('Daily exchanges spend', function () {
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+
+    function getExchangesSpendAPI(urlToTest) {
+        let currentDate = dayjs()
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Table rows display test', function () {
+        cy.wait(8000)
+        cy.selectTableRows('25', 25, 2, '#nuviad-daily-exchange-spend-card')
+        cy.selectTableRows('50', 50, 2, '#nuviad-daily-exchange-spend-card')
+        cy.selectTableRows('10', 10, 2, '#nuviad-daily-exchange-spend-card')
+    })
+
+    it('Refresh table', function () {
+        const currentDate = dayjs()
+        cy.get('#nuviad-daily-exchange-spend-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.wait(5000)
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/spend?date=${currentDate.format('YYYY-MM-DD')}`, Authorization)
+    })
+
+
+    it('Test date change and compare table data to API data', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-daily-exchange-spend-card > .pt-3 > :nth-child(1) > .col-lg-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        let currentDate = dayjs()
+        let yesterday = currentDate.subtract(1, 'days')
+        cy.log(yesterday.format('DD'))
+        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).eq(0).click()
+        cy.wait(5000)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/accounts/daily/summary?date=${yesterday.format('YYYY-MM-DD')}`, Authorization)
+        cy.request(getExchangesSpendAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/spend?date=${yesterday.format('YYYY-MM-DD')}`)).then(response => {
+            cy.get('#nuviad-daily-exchange-spend-table > .dataTables_wrapper > .table>tbody>tr').then($row => {
+                for (let i = 0; i < response.body.rows.length; i++) {
+                    for (let j = 0; j < $row.length; j++) {
+                        if (response.body.rows[i].exchange != "") {
+                            cy.get(`#nuviad-daily-exchange-spend-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(2)`).then($el => {
+                                if (response.body.rows[i].exchange == $el.text()) {
+                                    for (let k = 3; k <= 9; k++) {
+                                        cy.get(`#nuviad-daily-exchange-spend-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(${k})`).then($element => {
+                                            let elementText = $element.text()
+                                            if (k == 3) {
+                                                elementText = Number(elementText.replace(/\$|,/g, ''))
+                                                expect(elementText).eq(response.body.rows[i].impressions)
+                                            }
+                                            if (k == 4) {
+                                                elementText = Number(elementText.replace(/\$|,/g, ''))
+                                                expect(elementText).eq(response.body.rows[i].clicks)
+                                            }
+                                            if (k == 5) {
+                                                elementText = Number(elementText.replace(/\$|,/g, '')).toFixed(2)
+                                                let cpc = (response.body.rows[i].cpc).toFixed(2)
+
+
+                                                expect(elementText).eq(cpc)
+                                            }
+                                            if (k == 6) {
+                                                elementText = Number(elementText.replace("%", '')).toFixed(2)
+                                                let ctr = (response.body.rows[i].ctr).toFixed(2)
+                                                if (elementText > 1) {
+                                                    elementText = Math.round(elementText)
+                                                }
+                                                if (ctr > 1) {
+                                                    ctr = Math.round(ctr)
+                                                }
+                                                expect(elementText).eq(ctr)
+                                            }
+                                            if (k == 7) {
+                                                elementText = Number(elementText.replace(/\$|,/g, '')).toFixed(2)
+                                                let cost = Number(response.body.rows[i].cost).toFixed(2)
+                                                expect(elementText).eq(cost)
+                                            }
+                                            if (k == 8) {
+                                                elementText = Number(elementText.replace(/\$|,/g, '')).toFixed(0)
+                                                let spend = Number(response.body.rows[i].spend).toFixed(0)
+                                                expect(elementText).eq(spend)
+                                            }
+                                            if (k == 9) {
+                                                elementText = Number(elementText.replace(/\$|,/g, '')).toFixed(0)
+                                                let profit = Number(response.body.rows[i].profit).toFixed(0)
+                                                expect(elementText).eq(profit)
+                                            }
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            })
+
+        })
+    })
+
+    it('Test csv download',function(){
+        let currentDate = dayjs()
+        let yesterday = currentDate.subtract(1, 'days')
+        cy.get('#nuviad-daily-exchange-spend-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Daily exchanges spend ${yesterday.format('DD_MM_YYYY')}.csv`)).should("exist");
+    })
+}) */
+
+/* describe('Daily exchanges requests', function () {
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+
+    function getExchangesRequestsAPI(urlToTest) {
+        let currentDate = dayjs()
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Table rows display test', function () {
+        cy.wait(8000)
+        cy.selectTableRows('25', 25, 3, '#nuviad-daily-exchange-requests-card')
+        cy.selectTableRows('50', 50, 3, '#nuviad-daily-exchange-requests-card')
+        cy.selectTableRows('10', 10, 3, '#nuviad-daily-exchange-requests-card')
+    })
+
+    it('Refresh table', function () {
+        const currentDate = dayjs()
+        cy.get('#nuviad-daily-exchange-requests-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(5000)
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${currentDate.format('YYYY-MM-DD')}`, Authorization)
+    })
+
+
+    it('Test date change and compare table data to API data', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-daily-exchange-requests-card > .pt-3 > :nth-child(1) > .col-lg-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        let currentDate = dayjs()
+        let yesterday = currentDate.subtract(1, 'days')
+        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).eq(0).click()
+        cy.wait(5000)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${yesterday.format('YYYY-MM-DD')}`, Authorization)
+        cy.request(getExchangesRequestsAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${yesterday.format('YYYY-MM-DD')}`)).then(response => {
+            cy.get('#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table>tbody>tr').then($row => {
+                for (let i = 0; i < response.body.rows.length; i++) {
+                    for (let j = 0; j < $row.length; j++) {
+                        for(let t=0;t<response.body.related_entities.exchanges.length;t++){
+                            if(response.body.rows[i].exchange==response.body.related_entities.exchanges[t].id){
+                                cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(1)`).then($el => {
+                                    if(response.body.related_entities.exchanges[t].name==$el.text()){
+
+                                        for(let k=2;k<=4;k++){
+                                            cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j + 1}) > :nth-child(${k})`).then($element=>{
+                                                if(k==2){
+                                                    expect($element.text()).to.eq(response.body.rows[i].exchange)
+                                                }
+                                                if(k==3){
+                                                    let num=Number($element.text())
+                                                    expect(num).to.eq(response.body.related_entities.exchanges[t].num)
+                                                }
+
+                                            })
+                                        }
+                                        cy.get(`#nuviad-daily-exchange-requests-table > .dataTables_wrapper > .table > tbody > :nth-child(${j+1}) > .sorting_1`).then($req=>{
+                                            let requests=$req.text()
+                                            requests=Number(requests.replace(/\$|,/g, ''))
+                                            expect(requests).to.eq(response.body.rows[i].requests)
+                                        })
+                                    }
+                                })
+                            }
+                        }
+
+
+                    }
+                }
+            })
+
+        })
+    })
+
+    it('Test csv download',function(){
+        let currentDate = dayjs()
+        let yesterday = currentDate.subtract(1, 'days')
+        cy.get('#nuviad-daily-exchange-requests-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Daily exchanges requests ${yesterday.format('DD_MM_YYYY')}.csv`)).should("exist");
+    })
+}) */
+
+describe('Exchanges cost',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+
+    function getExchangesCostAPI(urlToTest) {
+        let currentDate = dayjs()
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    function rowsLimitSelect(selection,selectionToCompair,table) {
+        cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > .dataTables_length > label > select').select(selection)
+        cy.wait(3000)
+        cy.get(table).find('tbody>tr').then((rows) => {
+            if (selectionToCompair == 100) {
+                cy.wrap(rows.length).should('gt', 50)
+            } else {
+                cy.wrap(rows.length).should('be.lte', selectionToCompair)
+            }
+
+        })
+    }
+
+    it('Table rows display test', function () {
+        cy.wait(8000)
+        rowsLimitSelect('25', 25, '#nuviad-exchanges-cost-card')
+        rowsLimitSelect('50', 50, '#nuviad-exchanges-cost-card')
+        rowsLimitSelect('10', 10, '#nuviad-exchanges-cost-card')
+    })
+
+    it('Refresh table', function () {
+        const currentDate = dayjs()
+        cy.get('#nuviad-exchanges-cost-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(7000)
+        cy.get('#nuviad-exchanges-cost-card > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${currentDate.format('YYYY-MM-DD')}`, Authorization)
     })
 })

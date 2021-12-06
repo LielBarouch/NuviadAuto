@@ -5,6 +5,11 @@ const qps = 120
 const path = require("path");
 const dayjs = require('dayjs')
 
+const exchangeToTest = {
+    name: 'Beachfront',
+    id: 'exchange_sQcqbo4KvZ'
+}
+
 describe('Login Admin dashboard', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -475,6 +480,19 @@ describe('Charts', function () {
         }
         return apiToTest
     }
+    function getAPI(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
     /* it('Check actors names in Wins per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
         cy.wait(7000)
@@ -761,7 +779,103 @@ describe('Charts', function () {
             
         })
     })
+
+    it('Exchange by Country',function(){
+        const countryCode='ISR'
+        const country='Israel'
+        let count=0
+        cy.get('#nuviad-exchange-country-qps-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({force:true})
+        cy.wait(10000)
+        cy.get('#nuviad-exchange-country-qps-card > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        cy.get('#nuviad-exchange-country-qps-card > .pt-3 > :nth-child(1) > .col-lg-4 > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
+        cy.get('.css-1pahdxg-control').type(countryCode)
+        cy.get('.css-11unzgr').contains(country).click()
+        cy.wait(4000)
+        cy.get('#nuviad-exchange-country-qps-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Exchange by country ${country}.csv`)).should("exist");
+        cy.request(getAPI(`${this.data.API_BASE_URL}//admin/stats/exchanges/country/qps?cc=${countryCode}`)).then(response=>{
+            cy.get('#nuviad-exchange-country-qps-table > .dataTables_wrapper > .table > tbody > tr').then($tableRows=>{
+                for(let i=1;i<=$tableRows.length;i++){
+                    for(let j=0;j<response.body.related_entities.exchanges.length;j++){
+                        cy.get(`#nuviad-exchange-country-qps-table > .dataTables_wrapper > .table > tbody > :nth-child(${i}) > :nth-child(1)`).then($exName=>{
+                            if($exName.text()==response.body.related_entities.exchanges[j].name){
+                                count++
+                            }
+                        })
+                    }
+                }
+                cy.log(count).then(()=>{
+                    expect(count).to.eq($tableRows.length)
+                })
+            })
+        })
+        
+    }) 
+
+     it('Country by exchange',function(){
+        cy.get('#nuviad-exchange-traffic-by-country-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click({force:true})
+        cy.wait(5000)
+        cy.get('#nuviad-exchange-traffic-by-country-card > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        cy.get('#nuviad-exchange-traffic-by-country-card > .card-body > :nth-child(1) > .col-sm-4 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.css-1pahdxg-control > .css-1hwfws3').type(exchangeToTest.name)
+        cy.get('.css-11unzgr').contains(exchangeToTest.name).click()
+        cy.wait(4000)
+        cy.get('#nuviad-exchange-traffic-by-country-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Country by exchange - ${exchangeToTest.name}`)).should("exist")
+        cy.request(getAPI(`${this.data.API_BASE_URL}/exchanges/${exchangeToTest.id}/traffic_by_country`)).then(response=>{
+            cy.get('#nuviad-exchange-traffic-by-country-table > .dataTables_wrapper > .table > tbody > tr').then($tableRows=>{
+                for(let i=0;i<response.body.rows.length;i++){
+                    for(let j=1;j<$tableRows.length;j++){
+                        cy.get(`#nuviad-exchange-traffic-by-country-table > .dataTables_wrapper > .table > tbody > :nth-child(${j}) > :nth-child(1)`).then($country=>{
+                            if(response.body.rows[i].cc==$country.text()){
+                                cy.get(`#nuviad-exchange-traffic-by-country-table > .dataTables_wrapper > .table > tbody > :nth-child(${j}) > .sorting_1`).then($req=>{
+                                    let reqNum=$req.text()
+                                    reqNum=Number(reqNum.replace(/\$|,/g, ''))
+                                    expect(reqNum).to.eq(response.body.rows[i].requests)
+                                })
+                                cy.get(`#nuviad-exchange-traffic-by-country-table > .dataTables_wrapper > .table > tbody > :nth-child(${j}) > :nth-child(3)`).then($qps=>{
+                                    let qpsNum=$qps.text()
+                                    qpsNum=Number(qpsNum).toFixed(2)
+                                    let qpsFromApi=Number(response.body.rows[i].qps).toFixed(2)
+                                    
+                                    expect(qpsNum).to.eq(qpsFromApi)
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        })
+    }) 
+
+    it('QPS BY COUNTRY', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-exchange-country-minute-qps-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
+        cy.wait(10000)
+        cy.get('#nuviad-exchange-country-minute-qps-card > .align-items-center > .d-flex > span').then($updated => {
+            expect($updated.text()).to.eq('just now')
+        })
+        cy.get('.pt-3 > .p-2 > .col-sm-4 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.css-11unzgr').contains('6').click()
+        cy.wait(30000)
+        cy.get('.pt-3 > :nth-child(2) > .recharts-responsive-container > .recharts-wrapper > [width="936"] > .recharts-xAxis > .recharts-cartesian-axis-ticks > :nth-child(1) > .recharts-text > tspan').then($hourInChart => {
+            cy.log($hourInChart.text())
+            let currentTime = dayjs()
+            let timeMinusHours = currentTime.subtract(6, 'hours')
+            cy.log(timeMinusHours.format('hh:mm'))
+        })
+    })
 })
+
 
 /* describe('Daily actors spend', function () {
     beforeEach(function () {
