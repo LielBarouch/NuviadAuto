@@ -938,13 +938,89 @@ describe('Exchanges cost',function(){
 
     it('Refresh table', function () {
         const currentDate = dayjs()
+        const weekAgo=currentDate.subtract(6,'days')
         cy.get('#nuviad-exchanges-cost-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
-        cy.wait(7000)
+        cy.wait(10000)
         cy.get('#nuviad-exchanges-cost-card > .align-items-center > .d-flex > span').then($updated => {
             expect($updated.text()).to.eq('just now')
         })
         const token = Cypress.env('token');
         const Authorization = token;
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/daily/requests?date=${currentDate.format('YYYY-MM-DD')}`, Authorization)
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/cost?startDate=${weekAgo.format('YYYY-MM-DD')}&endDate=${currentDate.format('YYYY-MM-DD')}`, Authorization)
     })
+
+    it('Search test',function(){
+        cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > :nth-child(3) > label > input').type('Google')
+        cy.wait(5000)
+    })
+
+    it('Change start date',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const currentDate = dayjs()
+        const twoDaysAgo=currentDate.subtract(2,'days')
+        cy.get(':nth-child(1) > .mb-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        cy.get(`.react-datepicker__day--0${twoDaysAgo.format('DD')}`).eq(0).click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/cost?startDate=${twoDaysAgo.format('YYYY-MM-DD')}&endDate=${currentDate.format('YYYY-MM-DD')}`, Authorization)
+    })
+    
+    it('Change end date',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const currentDate = dayjs()
+        const twoDaysAgo=currentDate.subtract(2,'days')
+        const oneDaysAgo=currentDate.subtract(1,'days')
+        cy.get(':nth-child(2) > .mb-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        cy.get(`.react-datepicker__day--0${oneDaysAgo.format('DD')}`).eq(0).click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/cost?startDate=${twoDaysAgo.format('YYYY-MM-DD')}&endDate=${oneDaysAgo.format('YYYY-MM-DD')}`, Authorization)
+    })
+
+    it('Compare API data with table data',function(){
+        const currentDate = dayjs()
+        let twoDaysAgo=currentDate.subtract(2,'days')
+        twoDaysAgo=twoDaysAgo.subtract(11,'months')
+        const oneDaysAgo=currentDate.subtract(1,'days')
+        cy.request(getExchangesCostAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/cost?startDate=${twoDaysAgo.format('YYYY-MM-DD')}&endDate=${oneDaysAgo.format('YYYY-MM-DD')}`)).then(response=>{
+            for(let i=0;i<response.body.rows.length;i++){
+                for(let j=0;j<response.body.related_entities.exchanges.length;j++){
+                    if(response.body.rows[i].exchange==response.body.related_entities.exchanges[j].id){
+                        cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > .table > tbody > tr > :nth-child(1)').then($exchangeName=>{
+                            if(response.body.related_entities.exchanges[j].name==$exchangeName.text()){
+                                cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > .table > tbody > tr > :nth-child(2)').then($exchangeId=>{
+                                    expect($exchangeId.text()).to.eq(response.body.rows[i].exchange)
+                                })
+                                cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > .table > tbody > tr > :nth-child(3)').then($exchangeNum=>{
+                                    const number=Number($exchangeNum.text())
+                                    expect(number).to.eq(response.body.related_entities.exchanges[j].num)
+                                })
+                                cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > .table > tbody > tr > :nth-child(4)').then($exchangeImpressions=>{
+                                    let imp=$exchangeImpressions.text()
+                                    imp=Number(imp.replace(/\$|,/g, ''))
+                                    expect(imp).to.eq(response.body.rows[i].impressions)
+                                })
+                                cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > .table > tbody > tr > .sorting_1').then($exchangeCost=>{
+                                    let cost=$exchangeCost.text()
+                                    cost=Number(cost.replace(/\$|,/g, '')).toFixed(2)
+                                    let costFromApi=Number(response.body.rows[i].cost).toFixed(2)
+                                    expect(cost).to.eq(costFromApi)
+                                })
+                            }
+                        })
+                    }
+                }
+            }
+        })
+        
+    })
+
+    it('Test csv download',function(){
+        const currentDate = dayjs()
+        let twoDaysAgo=currentDate.subtract(2,'days')
+        twoDaysAgo=twoDaysAgo.subtract(11,'months')
+        const oneDaysAgo=currentDate.subtract(1,'days')
+        cy.get('#nuviad-exchanges-cost-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Exchanges cost ${twoDaysAgo.format('DD_MM_YYYY')} - ${oneDaysAgo.format('DD_MM_YYYY')}.csv`)).should("exist");
+    })    
 })
