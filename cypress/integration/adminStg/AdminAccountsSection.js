@@ -498,7 +498,7 @@ describe('Accounts section', function () {
     it('Enter to the admin dashboard login', function () {
         
         cy.visit(`${this.data.NuviadAdminDashboard}/login`)
-        cy.wait(10000)
+        
     })
     it('Login', function () {
         
@@ -506,19 +506,19 @@ describe('Accounts section', function () {
         cy.get('.btn-brand-02').click()
 
         cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
-        cy.wait(20000)
-        cy.log(initCredit)
+        cy.wait(10000)
+       
     })
 
     it('Enter Exchanges section', function () {
         cy.get(':nth-child(3) > .nav-link').click()
-        cy.wait(3000)
+        cy.wait(5000)
 
     })
     it('Create credit request', function () {
-        cy.get('#nuviad-credit-request-card > .align-items-center > .d-flex > :nth-child(1) > .sc-bdVaJa').click()
+        cy.get(':nth-child(3) > .sc-bdVaJa').click()
         cy.get('form > .row > :nth-child(1) > .form-group > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
-        cy.get('[style="transform: none; width: 711px; height: 29px; position: absolute; z-index: 2147483647; background-color: rgb(159, 196, 231); top: -4105.58px; left: 626px;"]').type('Patternz')
+        cy.get('.css-1pahdxg-control').type('Patternz')
         cy.get('.css-11unzgr').contains('Patternz (sivangrisario@gmail.com)').click()
         cy.get('#amount').clear()
         cy.get('#amount').type(1000)
@@ -550,7 +550,7 @@ describe('Accounts section', function () {
     })
 })
 
-/* describe('Test credit request rejecting process', function () {
+describe('Test credit request rejecting process', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -583,10 +583,16 @@ describe('Accounts section', function () {
         cy.wait(20000)
         cy.log(initCredit)
     })
+
+    it('Enter Exchanges section', function () {
+        cy.get(':nth-child(3) > .nav-link').click()
+        cy.wait(5000)
+
+    })
     it('Create credit request', function () {
-        cy.get('#nuviad-credit-request-card > .align-items-center > .d-flex > :nth-child(1) > .sc-bdVaJa').click()
+        cy.get(':nth-child(3) > .sc-bdVaJa').click()
         cy.get('form > .row > :nth-child(1) > .form-group > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
-        cy.get('.form-group > .css-2b097c-container').type('Patternz')
+        cy.get('.css-1pahdxg-control').type('Patternz')
         cy.get('.css-11unzgr').contains('Patternz (sivangrisario@gmail.com)').click()
         cy.get('#amount').clear()
         cy.get('#amount').type(1000)
@@ -626,7 +632,7 @@ describe('Accounts section', function () {
         cy.wait(20000)
         
     })
-}) */
+})
 
 /* describe('Daily actors spend', function () {
     beforeEach(function () {

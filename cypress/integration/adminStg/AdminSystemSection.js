@@ -26,7 +26,7 @@ describe('Login Admin dashboard', function () {
         cy.get('.btn-brand-02').click()
 
         cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
-        cy.wait(30000)
+        cy.wait(10000)
 
     })
 })
@@ -85,7 +85,7 @@ describe('System section', function () {
     
 })
 
-describe('Charts', function () {
+/* describe('Charts', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -128,7 +128,7 @@ describe('Charts', function () {
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`, Authorization)
         cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`)).then(response => {
             for (let i = 0; i < response.body.rows.length / 2; i++) {
-                cy.get('#nuviad-exchange-minute-qps-by-server-card').find('.recharts-legend-item-text').then($el => {
+                cy.get('#nuviad-exchange-minute-qps-by-server-card > .card-body').find('.customized-legend').find('span').then($el => {
                     let flag = false
                     for (let j = 0; j < $el.length; j++) {
                         let serv = $el.eq(j)
@@ -142,7 +142,7 @@ describe('Charts', function () {
             }
         })
 
-        cy.get('#nuviad-exchange-minute-qps-by-server-card > .card-body > .p-2 > .col-sm-2 > .mb-3 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.mb-3 > .css-2b097c-container > .css-yk16xz-control').click()
         cy.get('.css-11unzgr').contains('6').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=6`, Authorization)
         cy.wait(5000)
@@ -196,4 +196,87 @@ describe('Charts', function () {
         cy.get('.css-11unzgr').contains('Beachfront').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_sQcqbo4KvZ/minute_traffic?hours=72`,Authorization)
     })
+}) */
+
+describe('Bidder status',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function getAPI(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Table refresh test',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-bidders-status-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/bidders/status`,Authorization)
+    })
+
+    it('Test csv download',function(){
+        let currentDate = dayjs()
+        let yesterday = currentDate.subtract(1, 'days')
+        cy.get('.DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Bidders status.csv`)).should("exist");
+    })
+
+    /* it('Compare API data with table data',function(){
+        cy.get('#nuviad-bidders-status-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.request(getAPI(`${this.data.API_BASE_URL}/admin/bidders/status`)).then(response=>{
+            cy.get('#nuviad-bidders-status-card').find('tbody > tr').then($tableRows=>{
+                for(let i=0;i<3;i++){
+                    for(let j=2;j<=$tableRows.length;j++){
+                        cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(2)`).then($instanceId=>{
+                            if(response.body.rows[i].instance_id==$instanceId.text()){
+                                cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(3)`).then($azInTable=>{
+                                    expect($azInTable.text()).to.eq(response.body.rows[i].az)
+                                })
+                                cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(4)`).then($resTime=>{
+                                    let restime=Number($resTime.text())
+                                    expect(restime).to.eq(response.body.rows[i].resTime)
+                                })
+                                cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(5)`).then($errors=>{
+                                    let errorsInTable=Number($errors.text())
+                                    expect(errorsInTable).to.eq(response.body.rows[i].errors)
+                                })
+                                cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(6)`).then($instanceType=>{
+                                    expect($instanceType.text()).to.eq(response.body.rows[i].instanceType)
+                                })
+                                cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(7)`).then($requests=>{
+                                    let requestsInTable=$requests.text()
+                                    requestsInTable=Number(requestsInTable.replace(/\$|,/g, ''))
+                                    expect(requestsInTable).to.eq(response.body.rows[i].requests)
+                                })
+                                cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(8)`).then($qps=>{
+                                    let qpsInTable=Number($qps.text())
+                                    let qpsInApi=Number(response.body.rows[i].qps)
+                                    expect(qpsInTable).to.eq(qpsInApi)
+                                })
+                                cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(9)`).then($bids=>{
+                                    let bidsInTable=Number($bids.text())
+                                    expect(bidsInTable).to.eq(response.body.rows[i].bids)
+                                })
+                            }
+                        })
+                        
+                    }
+                }
+            })
+        })
+    }) */
 })
