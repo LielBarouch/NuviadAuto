@@ -19,32 +19,32 @@ describe('Login Admin dashboard', function () {
     })
 
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.ADMIN_PROD_URL}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
-        cy.wait(30000)
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
+        cy.wait(20000)
 
     })
     /* it('Logout',function(){
         cy.get('.avatar-initial').click({force:true})
         cy.get('.dropdown-item').click({force:true})
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
+        cy.url().should('eq',`${this.data.ADMIN_PROD_URL}/login/`)
     })
     it('Login again', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(6000)
 
     }) */
 })
- describe('Stats and APIs tests', function () {
+describe('Stats and APIs tests', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -100,7 +100,11 @@ describe('Login Admin dashboard', function () {
         })
     })
 
-}) 
+})
+
+
+
+
 
 
 describe('Charts', function () {
@@ -110,6 +114,19 @@ describe('Charts', function () {
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
+    function getMinApi(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
     function getAPI(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
@@ -123,21 +140,9 @@ describe('Charts', function () {
         }
         return apiToTest
     }
-    function testChartHours(hourToTest){
-        cy.get('.css-11unzgr').contains(hourToTest).click()
-        cy.wait(30000)
-        cy.get('.pt-3 > :nth-child(2) > .recharts-responsive-container > .recharts-wrapper > [width="936"] > .recharts-xAxis > .recharts-cartesian-axis-ticks > :nth-child(1) > .recharts-text > tspan').then($hourInChart => {
-            let hour=$hourInChart.text()
-            hour=hour.split(':')
-            cy.log(hour[0])
-            let currentTime = dayjs()
-            let timeMinusHours = currentTime.subtract(hourToTest, 'hours')
-            cy.log(timeMinusHours.format('hh'))
-        })
-    }
      it('Check actors names in Wins per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
-        cy.wait(8000)
+        cy.wait(7000)
         cy.get('#nuviad-per-minute-card-wins > .align-items-center > .d-flex > span').then($updated=>{
             expect($updated.text()).to.eq('just now')
         })
@@ -149,7 +154,7 @@ describe('Charts', function () {
             for(let i=0;i<actorsLenght;i++){
                 actorsArr[i]=$el.eq(i).text()
             }
-            cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
                 for(let i=0;i<actorsArr.length;i++){
                     for(let j=0;j<response.body.related_entities.accounts.length;j++){
                         if(actorsArr[i]==response.body.related_entities.accounts[j].name){
@@ -163,7 +168,7 @@ describe('Charts', function () {
     })
     it('Check actors names in Clicks per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-clicks > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
-        cy.wait(8000)
+        cy.wait(5000)
         cy.get('#nuviad-per-minute-card-clicks > .align-items-center > .d-flex > span').then($updated=>{
             expect($updated.text()).to.eq('just now')
         })
@@ -176,7 +181,7 @@ describe('Charts', function () {
                 actorsArr[i]=$el.eq(i).text()
                 cy.log(actorsArr[i])
             }
-            cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
                 for(let i=0;i<actorsArr.length;i++){
                     for(let j=0;j<response.body.related_entities.accounts.length;j++){
                         if(actorsArr[i]==response.body.related_entities.accounts[j].name){
@@ -190,7 +195,7 @@ describe('Charts', function () {
     })
     it('Check actors names in Spend per minutes chart',function(){
         cy.get('#nuviad-per-minute-card-spend > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
-        cy.wait(8000)
+        cy.wait(5000)
         cy.get('#nuviad-per-minute-card-spend > .align-items-center > .d-flex > span').then($updated=>{
             expect($updated.text()).to.eq('just now')
         })
@@ -202,7 +207,7 @@ describe('Charts', function () {
             for(let i=0;i<actorsLenght;i++){
                 actorsArr[i]=$el.eq(i).text()
             }
-            cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
+            cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/minute?hours=6`)).then(response=>{
                 for(let i=0;i<actorsArr.length;i++){
                     for(let j=0;j<response.body.related_entities.accounts.length;j++){
                         if(actorsArr[i]==response.body.related_entities.accounts[j].name){
@@ -213,108 +218,6 @@ describe('Charts', function () {
                 cy.wrap(compCount).should('eq',actorsLenght)
             })
         })
-    })
-
-    it('Exchange minute traffice chart' ,{retries:3},function(){
-        const token = Cypress.env('token');
-        const Authorization = token;
-        cy.get('#nuviad-exchange-minute-traffic-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
-        cy.wait(8000)
-        cy.get('#nuviad-exchange-minute-traffic-card > .align-items-center > .d-flex > span').then($updated=>{
-            expect($updated.text()).to.eq('just now')
-        })
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=1`,Authorization)
-        cy.get('.col-sm-2 > .css-2b097c-container > .css-yk16xz-control').click()
-        cy.get('.css-11unzgr').contains('2').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=2`,Authorization)
-        cy.wait(5000)
-        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
-        cy.get('.css-11unzgr').contains('3').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=3`,Authorization)
-        cy.wait(5000)
-        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
-        cy.get('.css-11unzgr').contains('6').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=6`,Authorization)
-        cy.wait(5000)
-        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
-        cy.get('.css-11unzgr').contains('12').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=12`,Authorization)
-        cy.wait(5000)
-        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
-        cy.get('.css-11unzgr').contains('24').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=24`,Authorization)
-        cy.wait(5000)
-        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
-        cy.get('.css-11unzgr').contains('48').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=48`,Authorization)
-        cy.wait(5000)
-        cy.get('.css-1gtu0rj-indicatorContainer > .css-19bqh2r').click()
-        cy.get('.css-11unzgr').contains('72').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_FHTdban0dWKfSa2xOJI9qIQyXH7CLq/minute_traffic?hours=72`,Authorization)
-        cy.get('#nuviad-exchange-minute-traffic-card > .card-body > .p-2 > .col-sm-4 > .css-2b097c-container > .css-yk16xz-control').click()
-        cy.get('.css-11unzgr').contains('Beachfront').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/exchanges/exchange_sQcqbo4KvZ/minute_traffic?hours=72`,Authorization)
-    })
-    it('Check if Exchange minute traffice chart is visable to non-admin user',function(){
-        cy.get('.avatar-initial').click({force:true})
-        cy.get('.dropdown-item').click({force:true})
-        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
-        cy.wait(3000)
-        cy.AdminLogin("stg-admin@nuviad.com", "qwerty123")
-        cy.get('.btn-brand-02').click()
-
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
-        cy.wait(10000)
-        cy.get('#nuviad-exchange-minute-traffic-card').should('not.exist')
-        cy.get('.avatar-initial').click({force:true})
-        cy.get('.dropdown-item').click({force:true})
-        cy.get('.ProgressButton_wrapper__2qZuW > .btn').click({force:true})
-        cy.url().should('eq',`${this.data.NuviadAdminDashboard}/login/`)
-        cy.wait(3000)
-        cy.AdminLogin(this.data.emailAdmin, this.data.password)
-        cy.get('.btn-brand-02').click()
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
-        cy.wait(10000)
-    })
-
-    it('Test Exchanges Minute QPS by server', function () {
-        const token = Cypress.env('token');
-        const Authorization = token;
-        cy.get('#nuviad-exchange-minute-qps-by-server-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa > path').click({ force: true })
-        cy.wait(20000)
-        cy.get('#nuviad-exchange-minute-qps-by-server-card > .align-items-center > .d-flex > span').then($updated => {
-            expect($updated.text()).to.eq('just now')
-        })
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`, Authorization)
-        cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`)).then(response => {
-            for (let i = 0; i < response.body.rows.length / 2; i++) {
-                cy.get('#nuviad-exchange-minute-qps-by-server-card').find('.recharts-legend-item-text').then($el => {
-                    let flag = false
-                    for (let j = 0; j < $el.length; j++) {
-                        let serv = $el.eq(j)
-                        serv = serv.text()
-                        if (serv == response.body.rows[i].server_az) {
-                            flag = true
-                        }
-                    }
-                    expect(flag).to.eq(true)
-                })
-            }
-        })
-
-        cy.get('#nuviad-exchange-minute-qps-by-server-card > .card-body > .p-2 > .col-sm-2 > .mb-3 > .css-2b097c-container > .css-yk16xz-control').click()
-        cy.get('.css-11unzgr').contains('6').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=6`, Authorization)
-        cy.wait(5000)
-        cy.get('.css-1pahdxg-control').click()
-        cy.get('.css-11unzgr').contains('12').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=12`, Authorization)
-        cy.wait(5000)
-        cy.get('.css-1pahdxg-control').click()
-        cy.get('.css-11unzgr').contains('24').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=24`, Authorization)
-        cy.wait(5000)
     })
 
     it('Test Exchanges Minute QPS by country', function () {
@@ -336,7 +239,7 @@ describe('Charts', function () {
             for (let i = 0; i < $el.length; i++) {
                 let country = $el.eq(i)
                 country = country.text()
-                cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=3`)).then(response => {
+                cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=3`)).then(response => {
                     for (let j = 0; j < response.body.rows.length; j++) {
                         if (country == response.body.rows[j].cc) {
                             if (response.body.rows[j].qps >= qps) {
@@ -368,7 +271,7 @@ describe('Charts', function () {
         cy.get('.css-11unzgr').contains('24').click()
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_country?hours=24`, Authorization)
         cy.wait(5000)
-    })
+    }) 
 
     it('Test Minute Conversions',function(){
         const token = Cypress.env('token');
@@ -395,7 +298,7 @@ describe('Charts', function () {
             for (let i = 0; i < $el.length; i++) {
                 let actors = $el.eq(i)
                 actors = actors.text()
-                cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`)).then(response => {
+                cy.request(getMinApi(`${this.data.API_BASE_URL}/admin/stats/conversions/minute?hours=24&stage=0`)).then(response => {
                     for (let j = 0; j < response.body.related_entities.accounts.length; j++) {
                         if(actors==response.body.related_entities.accounts[j].name){
                             for(let k=0;k<response.body.rows.length;k++){
@@ -412,7 +315,7 @@ describe('Charts', function () {
         })
     })
 
-     it('Exchange by Country',function(){
+    it('Exchange by Country',function(){
         const countryCode='ISR'
         const country='Israel'
         let count=0
@@ -497,11 +400,15 @@ describe('Charts', function () {
             expect($updated.text()).to.eq('just now')
         })
         cy.get('.pt-3 > .p-2 > .col-sm-4 > .css-2b097c-container > .css-yk16xz-control').click()
-        testChartHours(6)
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/country/minute_qps?cc=MEX&hours=6`,Authorization)
-        cy.get('#nuviad-exchange-country-minute-qps-card > .pt-3 > .p-2 > .col-lg-4 > .css-2b097c-container > .css-yk16xz-control > .css-1hwfws3').click()
-        cy.get('.css-1pahdxg-control').type('Israel')
-        cy.get('.css-11unzgr').contains('Israel').click()
-        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/country/minute_qps?cc=ISR&hours=6`,Authorization)
+        cy.get('.css-11unzgr').contains('6').click()
+        cy.wait(30000)
+        cy.get('.pt-3 > :nth-child(2) > .recharts-responsive-container > .recharts-wrapper > [width="936"] > .recharts-xAxis > .recharts-cartesian-axis-ticks > :nth-child(1) > .recharts-text > tspan').then($hourInChart => {
+            cy.log($hourInChart.text())
+            let currentTime = dayjs()
+            let timeMinusHours = currentTime.subtract(6, 'hours')
+            cy.log(timeMinusHours.format('hh:mm'))
+        })
     })
 })
+
+

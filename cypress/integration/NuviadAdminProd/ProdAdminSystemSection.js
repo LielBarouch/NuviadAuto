@@ -19,13 +19,13 @@ describe('Login Admin dashboard', function () {
     })
 
     it('Enter to the admin dashboard login', function () {
-        cy.visit(`${this.data.NuviadAdminDashboard}/login`)
+        cy.visit(`${this.data.ADMIN_PROD_URL}/login`)
     })
     it('Login', function () {
         cy.AdminLogin(this.data.emailAdmin, this.data.password)
         cy.get('.btn-brand-02').click()
 
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/')
         cy.wait(10000)
 
     })
@@ -44,7 +44,7 @@ describe('System section', function () {
 
     })
     it('Check the url', function () {
-        cy.url().should('eq', 'https://admin-stg.nuviad.com/dashboard/system')
+        cy.url().should('eq', 'https://admin.nuviad.com/dashboard/system')
         
     })
 
@@ -128,7 +128,7 @@ describe('System section', function () {
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`, Authorization)
         cy.request(getAPI(`${this.data.API_BASE_URL}/admin/stats/exchanges/minute/qps/by_server?hours=3`)).then(response => {
             for (let i = 0; i < response.body.rows.length / 2; i++) {
-                cy.get('#nuviad-exchange-minute-qps-by-server-card > .card-body').find('.customized-legend').find('span').then($el => {
+                cy.get('#nuviad-exchange-minute-qps-by-server-card > .card-body').find('.recharts-legend-item-text').then($el => {
                     let flag = false
                     for (let j = 0; j < $el.length; j++) {
                         let serv = $el.eq(j)
