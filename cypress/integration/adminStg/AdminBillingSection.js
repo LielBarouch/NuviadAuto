@@ -40,7 +40,7 @@ describe('Billing section', function () {
     })
 })
 
-describe('System daily billing',function(){
+/* describe('System daily billing',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -135,5 +135,84 @@ describe('System daily billing',function(){
             expect($span.text()).to.eq('just now')
         })
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/billing/system/daily?date_start=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`,Authorization)
+    })
+}) */
+
+
+describe('Accounts billing',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function getBillingApi(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Date change test',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.get('#nuviad-accounts-billing-card > .pt-3 > :nth-child(1) > :nth-child(1) > .mb-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        cy.get('.react-datepicker__month-read-view').click()
+        cy.get('.react-datepicker__month-dropdown').contains(thisMonth.format('MMMM')).click()
+        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).eq(0).click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/billing/account?date_start=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`,Authorization)
+    })
+
+    it('Compare API data with table data',function(){
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.request(getBillingApi(`${this.data.API_BASE_URL}/admin/billing/account?account=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`)).then(response=>{
+            for(let i=0;i<response.body.rows.length;i++){
+                for(let j=0;j<response.body.related_entities.accounts.length;j++){
+                    if(response.body.rows[i].actor_id==response.body.related_entities.accounts[j].id)
+                    cy.get('#nuviad-accounts-billing-table > .dataTables_wrapper > .table > tbody > tr').then($tableRows=>{
+                        for(let k=1;k<=$tableRows.length;k++){
+                            cy.get(`#nuviad-accounts-billing-table > .dataTables_wrapper > .table > tbody > :nth-child(${k}) > :nth-child(1)`).then($nameInTable=>{
+                                if($nameInTable.text()==response.body.related_entities.accounts[j].name){
+                                    cy.log(response.body.rows[i].actor_id+' '+response.body.related_entities.accounts[j].id)
+                                }
+                            })
+                        }
+                    })
+                }
+                
+            }
+        })
+    })
+    
+    it('Test csv download',function(){
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.get('#nuviad-accounts-billing-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Accounts billing ${yesterday.format('DD_MM_YYYY')} - ${thisMonth.format('DD_MM_YYYY')}.csv`)).should("exist");
+    })
+
+    it('Refresh table test',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.get('#nuviad-accounts-billing-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.wait(10000)
+        cy.get('#nuviad-accounts-billing-card > .align-items-center > .d-flex > span').then($span=>{
+            expect($span.text()).to.eq('just now')
+        })
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/billing/account?date_start=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`,Authorization)
     })
 })
