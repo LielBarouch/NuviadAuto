@@ -588,9 +588,9 @@ describe('Accounts billing',function(){
        
     })
 
-    it('Enter Exchanges section', function () {
+    it('Enter Accounts section', function () {
         cy.get(':nth-child(3) > .nav-link').click()
-        cy.wait(5000)
+        cy.wait(10000)
 
     })
     it('Create credit request', function () {
@@ -608,6 +608,15 @@ describe('Accounts billing',function(){
         cy.get(':nth-child(1) > :nth-child(10) > .btn-group > :nth-child(1) > svg').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(10000)
+    })
+    it('Check credit change in accounts table',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('Patternz')
+        cy.wait(4000)
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .table > tbody > :nth-child(2) > :nth-child(6)').then($amount=>{
+            let amountOfUser=$amount.text()
+            amountOfUser=Number(amountOfUser.replace(/\$|,/g, ''))
+            expect(amountOfUser).to.eq(creditToComp)
+        })
     })
     it('Login to dashboard', function () {
         cy.visit(`${this.data.NuviadDashboard}/login/#`)
@@ -628,7 +637,7 @@ describe('Accounts billing',function(){
     })
 })
 
-describe('Test credit request rejecting process', function () {
+/* describe('Test credit request rejecting process', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -710,7 +719,7 @@ describe('Test credit request rejecting process', function () {
         cy.wait(20000)
         
     })
-})
+}) */
 
 /* describe('Daily actors spend', function () {
     beforeEach(function () {

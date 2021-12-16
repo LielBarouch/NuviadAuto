@@ -40,7 +40,7 @@ describe('Ads section', function () {
     })
 })
 
-describe('Test pending ads table', function () {
+describe('Test ads table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -60,7 +60,7 @@ describe('Test pending ads table', function () {
         }
         return apiToTest
     }
-    it('Test pending ads table', function () {
+    it('Test pending ads', function () {
         cy.get('.sc-bdVaJa').click({ force: true })
 
         cy.request(getAdsApi(this.data)).then(response => {
