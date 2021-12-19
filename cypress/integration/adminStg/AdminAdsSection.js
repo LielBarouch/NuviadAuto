@@ -47,12 +47,12 @@ describe('Test ads table', function () {
         })
         cy.getToken("liel@nuviad.com", "lb123456")
     })
-    function getAdsApi(data) {
+    function getAdsApi(urlToTest) {
         const token = Cypress.env('token');
         const Authorization = token;
         const apiToTest = {
             method: 'GET',
-            url: `${data.API_BASE_URL}/admin/ads/?limit=1000&status=PENDING_VERIFICATION`,
+            url: urlToTest,
             headers: {
                 Authorization,
             },
@@ -61,42 +61,31 @@ describe('Test ads table', function () {
         return apiToTest
     }
     it('Test pending ads', function () {
-        cy.get('.sc-bdVaJa').click({ force: true })
-
-        cy.request(getAdsApi(this.data)).then(response => {
-            if (response.body.meta_data.total) {
-                const adsCount = Number(response.body.items.length)
-                cy.get('.dataTables_info').should('contain.text', adsCount)
-                cy.wrap(adsCount).should('eq', response.body.meta_data.total)
-                let count = 0;
-                for (let i = 0; i < response.body.items.length; i++) {
-                    if (response.body.items[i].owner == "actor_TPrgTKLaeL4qNVuNliGsqwe9imAzB" && response.body.items[i].approved == false) {
-                        count++;
+        cy.request(getAdsApi(`${this.data.API_BASE_URL}/admin/ads/?status=PENDING_VERIFICATION`)).then(res=>{
+            for(let i=0;i<res.body.items.length;i++){
+                cy.get('tbody > tr').then($tableRows=>{
+                    for(let j=1;j<$tableRows.length;j++){
+                        cy.get(`tbody > :nth-child(${j}) > :nth-child(5)`).then($id=>{
+                            if($id.text()==res.body.items[i]._id){
+                                cy.log(res.body.items[i].name)
+                            }
+                        })
                     }
-                }
-                cy.log(count)
+                })
             }
-
         })
     })
     it('Test search', function () {
         cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
-        cy.request(getAdsApi(this.data)).then(response => {
-            if (response.body.meta_data.total) {
-                let count = 0;
-                for (let i = 0; i < response.body.items.length; i++) {
-                    if (response.body.items[i].owner == "actor_TPrgTKLaeL4qNVuNliGsqwe9imAzB" && response.body.items[i].approved == false) {
-                        count++;
-                    }
-                }
-                cy.log(count)
-                cy.get('.dataTables_info').should('contain.text', count)
+        cy.get('tbody > tr').then($tableRows=>{
+            for(let j=1;j<$tableRows.length;j++){
+                cy.get(`tbody > :nth-child(${j}) > :nth-child(2)`).then($user=>{
+                    expect($user.text()).to.eq('LielTest')
+                })
             }
-
-            cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').clear()
         })
     })
-    it('Table rows display test', function () {
+    /* it('Table rows display test', function () {
         cy.selectTableRows('25', 25, 0, '#nuviad-ads-card')
         cy.selectTableRows('50', 50, 0, '#nuviad-ads-card')
         cy.selectTableRows('100', 100, 0, '#nuviad-ads-card')
@@ -106,5 +95,5 @@ describe('Test ads table', function () {
         cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
         cy.wait(4000)
         
-    })
+    }) */
 })

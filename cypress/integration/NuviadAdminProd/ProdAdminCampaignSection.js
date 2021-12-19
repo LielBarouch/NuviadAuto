@@ -29,7 +29,7 @@ describe('Login to admin dashboard', function () {
         cy.wait(10000)
 
     })
-    it('Enter Exchanges section', function () {
+    it('Enter campaign section', function () {
         cy.get(':nth-child(5) > .nav-link').click()
         cy.wait(3000)
         cy.url().should('eq', 'https://admin.nuviad.com/dashboard/campaigns')
@@ -104,7 +104,7 @@ describe('Login to admin dashboard', function () {
     })
 }) */
 
-describe('Campaign section', function () {
+/* describe('Campaign section', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -286,5 +286,51 @@ describe('Campaign section', function () {
                 })
             }
         })
+    })
+}) */
+
+describe('Wins Campaign Minute Spend', function () {
+
+    let campToTest=''
+    Cypress.Commands.add("campToTest", { prevSubject: true }, (value) => {
+        campToTest = value;
+    })
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    it('Search for actor', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('.css-1hwfws3').click()
+        cy.get('.css-1pahdxg-control').type('Global')
+        cy.get('.css-11unzgr').contains('Global').click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/campaigns?owner_id=actor_n8q7IDEMysmDeHaR3K5itxNSbono4r`, Authorization)
+    })
+
+    it('Show active campaigns', function () {
+        cy.get('.col-lg-3 > .css-2b097c-container > .css-yk16xz-control').click()
+        cy.get('.css-11unzgr').contains('ACTIVE').click()
+        cy.wait(3000)
+    })
+
+    it('Get a campaign id to test and open the modal', function () {
+        cy.get('#nuviad-campaigns-table > .dataTables_wrapper > .table > tbody > :nth-child(1) > :nth-child(2)').invoke('text').campToTest()
+        cy.get(':nth-child(1) > :nth-child(8) > .btn-group > :nth-child(3) > .svg-inline--fa').click({force:true})
+    })
+
+    it('Test the campaign minute wins modal',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('.modal-body > :nth-child(1) > .col-sm-12').then($title=>{
+            expect($title.text()).to.contain(campToTest)
+        })
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/stats/campaign/wins/minute?campaign_id=${campToTest}&hours=3`,Authorization)
+    })
+
+    it('Close the modal',function(){
+        cy.get('.modal-footer > .btn').click()
     })
 })

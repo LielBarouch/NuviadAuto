@@ -280,3 +280,62 @@ describe('Bidder status',function(){
         })
     }) */
 })
+
+describe('Detailed bidder view', function () {
+    let bidderToTest = ''
+    Cypress.Commands.add("bidderToTest", { prevSubject: true }, (value) => {
+        bidderToTest = value
+    })
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function getAPI(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+    it('Enter to the detailed bidder view', function () {
+        cy.get('tbody > :nth-child(1) > :nth-child(2)').invoke('text').bidderToTest()
+        cy.get(':nth-child(1) > :nth-child(10) > a').click({ force: true })
+    })
+    it('Verify that we are looking a the right instance details', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('.modal-content > .align-items-center > .tx-uppercase').then($title => {
+            expect($title.text()).to.contain(bidderToTest)
+        })
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/bidders/instance/status?instance=${bidderToTest}`, Authorization)
+    })
+    it('Refresh table test', function () {
+        cy.get('.modal-content > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click({ force: true })
+        cy.wait(5000)
+        cy.get('.modal-content > .align-items-center > .d-flex > span').then($span => {
+            expect($span.text()).to.eq('just now')
+        })
+    })
+    it('Compare table data with API data', function () {
+        cy.get('#nuviad-bidders-instance-status-table > .dataTables_wrapper > .dataTables_length > label > select').select('100')
+        cy.request(getAPI(`${this.data.API_BASE_URL}/admin/bidders/instance/status?instance=${bidderToTest}`)).then(res => {
+            cy.get('#nuviad-bidders-instance-status-table > .dataTables_wrapper > .table > tbody > tr').then($tableRows => {
+                expect($tableRows.length).to.eq(res.body.rows.length)
+            })
+        })
+    })
+    it('Test csv download', function () {
+        cy.get('#nuviad-bidders-instance-status-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Bidders instance ${bidderToTest} status.csv`)).should("exist");
+    })
+})

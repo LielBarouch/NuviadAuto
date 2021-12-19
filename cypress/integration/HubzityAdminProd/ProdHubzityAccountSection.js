@@ -50,6 +50,85 @@ describe('Accounts section', function () {
     })
 })
 
+describe('Accounts billing',function(){
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function getBillingApi(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Date change test',function(){
+        cy.wait(20000)
+        const token = Cypress.env('token');
+        const Authorization = token;
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.get('#nuviad-accounts-billing-card > .pt-3 > :nth-child(1) > :nth-child(1) > .mb-3 > .react-datepicker-wrapper > .react-datepicker__input-container > .form-control').click()
+        cy.get('.react-datepicker__month-read-view').click()
+        cy.get('.react-datepicker__month-dropdown').contains(thisMonth.format('MMMM')).click()
+        cy.get(`.react-datepicker__day--0${yesterday.format('DD')}`).eq(0).click()
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/billing/account?date_start=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`,Authorization)
+    })
+
+    it('Compare API data with table data',function(){
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.request(getBillingApi(`${this.data.API_BASE_URL}/admin/billing/account?account=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`)).then(response=>{
+            for(let i=0;i<response.body.rows.length;i++){
+                for(let j=0;j<response.body.related_entities.accounts.length;j++){
+                    if(response.body.rows[i].actor_id==response.body.related_entities.accounts[j].id)
+                    cy.get('#nuviad-accounts-billing-table > .dataTables_wrapper > .table > tbody > tr').then($tableRows=>{
+                        for(let k=1;k<=$tableRows.length;k++){
+                            cy.get(`#nuviad-accounts-billing-table > .dataTables_wrapper > .table > tbody > :nth-child(${k}) > :nth-child(1)`).then($nameInTable=>{
+                                if($nameInTable.text()==response.body.related_entities.accounts[j].name){
+                                    cy.log(response.body.rows[i].actor_id+' '+response.body.related_entities.accounts[j].id)
+                                }
+                            })
+                        }
+                    })
+                }
+                
+            }
+        })
+    })
+    
+    it('Test csv download',function(){
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.get('#nuviad-accounts-billing-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Accounts billing ${yesterday.format('DD_MM_YYYY')} - ${thisMonth.format('DD_MM_YYYY')}.csv`)).should("exist");
+    })
+
+    it('Refresh table test',function(){
+        const token = Cypress.env('token');
+        const Authorization = token;
+        let thisMonth=dayjs()
+        let yesterday=thisMonth.subtract(1,'day')
+        cy.get('#nuviad-accounts-billing-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
+        cy.wait(10000)
+        cy.get('#nuviad-accounts-billing-card > .align-items-center > .d-flex > span').then($span=>{
+            expect($span.text()).to.eq('just now')
+        })
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/billing/account?date_start=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`,Authorization)
+    })
+})
+
  /* describe('Test pending accounts table', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -168,7 +247,7 @@ describe('Accounts section', function () {
     })
 }) */ 
 
- describe('Test margin set', function () {
+ /* describe('Test margin set', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -470,7 +549,7 @@ describe('Accounts section', function () {
         })
         cy.get('.modal-footer > .btn').click()
     })
- }) 
+ })  */
 
  describe('Test credit request approving process', function () {
     
@@ -510,9 +589,9 @@ describe('Accounts section', function () {
        
     })
 
-    it('Enter Exchanges section', function () {
+    it('Enter Accounts section', function () {
         cy.get(':nth-child(3) > .nav-link').click()
-        cy.wait(5000)
+        cy.wait(10000)
 
     })
     it('Create credit request', function () {
@@ -530,6 +609,15 @@ describe('Accounts section', function () {
         cy.get(':nth-child(1) > :nth-child(10) > .btn-group > :nth-child(1) > svg').click()
         cy.get('.ProgressButton_wrapper__2qZuW > .btn').click()
         cy.wait(10000)
+    })
+    it('Check credit change in accounts table',function(){
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .dataTables_filter > label > input').type('Patternz')
+        cy.wait(4000)
+        cy.get('#nuviad-accounts-table > .dataTables_wrapper > .table > tbody > :nth-child(2) > :nth-child(6)').then($amount=>{
+            let amountOfUser=$amount.text()
+            amountOfUser=Number(amountOfUser.replace(/\$|,/g, ''))
+            expect(amountOfUser).to.eq(creditToComp)
+        })
     })
     it('Login to dashboard', function () {
         cy.visit(`${this.data.HubzityDashborad}/login/#`)
