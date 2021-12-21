@@ -85,7 +85,9 @@ describe('System section', function () {
 
 })
 
-describe('Charts', function () {
+
+
+/* describe('Charts', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -235,7 +237,7 @@ describe('Bidder status', function () {
         cy.readFile(path.join(downloadsFolder, `Bidders status.csv`)).should("exist");
     })
 
-    /* it('Compare API data with table data',function(){
+    it('Compare API data with table data',function(){
         cy.get('#nuviad-bidders-status-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click()
         cy.request(getAPI(`${this.data.API_BASE_URL}/admin/bidders/status`)).then(response=>{
             cy.get('#nuviad-bidders-status-card').find('tbody > tr').then($tableRows=>{
@@ -278,10 +280,10 @@ describe('Bidder status', function () {
                 }
             })
         })
-    }) */
-})
+    }) 
+}) */
 
-describe('Detailed bidder view', function () {
+/* describe('Detailed bidder view', function () {
     let bidderToTest = ''
     Cypress.Commands.add("bidderToTest", { prevSubject: true }, (value) => {
         bidderToTest = value
@@ -338,4 +340,71 @@ describe('Detailed bidder view', function () {
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Bidders instance ${bidderToTest} status.csv`)).should("exist");
     })
+}) */
+
+describe('Servers status', function () {
+    beforeEach(function () {
+        cy.fixture('example').then(function (data) {
+            this.data = data
+        })
+        cy.getToken("liel@nuviad.com", "lb123456")
+    })
+    function getAPI(urlToTest) {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        const apiToTest = {
+            method: 'GET',
+            url: urlToTest,
+            headers: {
+                Authorization,
+            },
+            body: {}
+        }
+        return apiToTest
+    }
+
+    it('Verify latest server check', function () {
+        let currentDate = dayjs()
+        let currentTime = currentDate.subtract(2, 'hours').format('YYYY-MM-DDTHH:mm')
+        cy.request(getAPI(`${this.data.API_BASE_URL}/admin/servers/status`)).then(res => {
+            for (let i = 0; i < res.body.rows.length; i++) {
+                cy.get('#nuviad-servers-status-table > .dataTables_wrapper > .table > tbody > tr').then($tableRows => {
+                    for (let j = 1; j <= $tableRows.length; j++) {
+                        cy.get(`#nuviad-servers-status-table > .dataTables_wrapper > .table > tbody > :nth-child(${j}) > :nth-child(2)`).then($serverIntable => {
+                            if ($serverIntable.text() == res.body.rows[i].instance_id) {
+                                let now = String(res.body.rows[i].tsz)
+                                now = now.split(':')
+                                let nowString = now[0] + ':' + now[1]
+                                const currentTimeToCheck=dayjs(currentTime)
+                                let timeBetweenCheck = currentTimeToCheck.diff(nowString, 'minutes')
+                                expect(timeBetweenCheck).to.lte(1)
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    })
+
+    it('Table refresh test', function () {
+        const token = Cypress.env('token');
+        const Authorization = token;
+        cy.get('#nuviad-servers-status-card > .align-items-center > .d-flex > .lh-0 > .sc-bdVaJa').click({ force: true })
+        cy.wait(6000)
+        cy.get('#nuviad-servers-status-card > .align-items-center > .d-flex > span').then($span => {
+            expect($span.text()).to.eq('just now')
+        })
+        cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/servers/status`, Authorization)
+    })
+
+    it('Test csv download', function () {
+        let currentDate = dayjs()
+        let yesterday = currentDate.subtract(1, 'days')
+        cy.get('#nuviad-servers-status-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.wait(12000)
+        const downloadsFolder = Cypress.config("downloadsFolder");
+        cy.readFile(path.join(downloadsFolder, `Servers status.csv`)).should("exist");
+    })
+
+
 })

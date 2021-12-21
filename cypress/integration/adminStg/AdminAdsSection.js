@@ -60,6 +60,12 @@ describe('Test ads table', function () {
         }
         return apiToTest
     }
+    it('Table rows display test', function () {
+        cy.selectTableRows('25', 25, 0, '#nuviad-ads-card')
+        cy.selectTableRows('50', 50, 0, '#nuviad-ads-card')
+        cy.selectTableRows('10', 10, 0, '#nuviad-ads-card')
+        cy.selectTableRows('100', 100, 0, '#nuviad-ads-card')
+    })
     it('Test pending ads', function () {
         cy.request(getAdsApi(`${this.data.API_BASE_URL}/admin/ads/?status=PENDING_VERIFICATION`)).then(res=>{
             for(let i=0;i<res.body.items.length;i++){
@@ -67,7 +73,7 @@ describe('Test ads table', function () {
                     for(let j=1;j<$tableRows.length;j++){
                         cy.get(`tbody > :nth-child(${j}) > :nth-child(5)`).then($id=>{
                             if($id.text()==res.body.items[i]._id){
-                                cy.log(res.body.items[i].name)
+                                expect(res.body.items[i].status).to.eq('PENDING_VERIFICATION')
                             }
                         })
                     }
@@ -75,7 +81,25 @@ describe('Test ads table', function () {
             }
         })
     })
-    it('Test search', function () {
+    it('Test active ads', function () {
+        cy.get('.css-yk16xz-control').click()
+        cy.get('.css-11unzgr').contains('INACTIVE').click()
+        cy.wait(20000)
+        cy.request(getAdsApi(`${this.data.API_BASE_URL}/admin/ads/?status=INACTIVE`)).then(res=>{
+            for(let i=0;i<res.body.items.length;i++){
+                cy.get('tbody > tr').then($tableRows=>{
+                    for(let j=1;j<$tableRows.length;j++){
+                        cy.get(`tbody > :nth-child(${j}) > :nth-child(5)`).then($id=>{
+                            if($id.text()==res.body.items[i]._id){
+                                expect(res.body.items[i].status).to.eq('INACTIVE')
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    })
+    /* it('Test search', function () {
         cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
         cy.get('tbody > tr').then($tableRows=>{
             for(let j=1;j<$tableRows.length;j++){
@@ -84,13 +108,8 @@ describe('Test ads table', function () {
                 })
             }
         })
-    })
-    /* it('Table rows display test', function () {
-        cy.selectTableRows('25', 25, 0, '#nuviad-ads-card')
-        cy.selectTableRows('50', 50, 0, '#nuviad-ads-card')
-        cy.selectTableRows('100', 100, 0, '#nuviad-ads-card')
-        cy.selectTableRows('10', 10, 0, '#nuviad-ads-card')
-    })
+    }) */
+    /* 
     it('Ad preview', function () {
         cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
         cy.wait(4000)
