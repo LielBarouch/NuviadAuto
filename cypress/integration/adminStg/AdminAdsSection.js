@@ -1,5 +1,7 @@
 /// <reference types="Cypress" />
 
+
+
 describe('Login to admin dashboard', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
@@ -41,6 +43,15 @@ describe('Ads section', function () {
 })
 
 describe('Test ads table', function () {
+    let adToTest = {
+        name: 'Ad preview test',
+        owner: '',
+        campaign: '',
+        id: ''
+    }
+    Cypress.Commands.add("adToTest_owner", { prevSubject: true }, (value) => {
+        adToTest.owner = value
+    })
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -67,12 +78,12 @@ describe('Test ads table', function () {
         cy.selectTableRows('100', 100, 0, '#nuviad-ads-card')
     })
     it('Test pending ads', function () {
-        cy.request(getAdsApi(`${this.data.API_BASE_URL}/admin/ads/?status=PENDING_VERIFICATION`)).then(res=>{
-            for(let i=0;i<res.body.items.length;i++){
-                cy.get('tbody > tr').then($tableRows=>{
-                    for(let j=1;j<$tableRows.length;j++){
-                        cy.get(`tbody > :nth-child(${j}) > :nth-child(5)`).then($id=>{
-                            if($id.text()==res.body.items[i]._id){
+        cy.request(getAdsApi(`${this.data.API_BASE_URL}/admin/ads/?status=PENDING_VERIFICATION`)).then(res => {
+            for (let i = 0; i < res.body.items.length; i++) {
+                cy.get('tbody > tr').then($tableRows => {
+                    for (let j = 1; j < $tableRows.length; j++) {
+                        cy.get(`tbody > :nth-child(${j}) > :nth-child(5)`).then($id => {
+                            if ($id.text() == res.body.items[i]._id) {
                                 expect(res.body.items[i].status).to.eq('PENDING_VERIFICATION')
                             }
                         })
@@ -81,7 +92,27 @@ describe('Test ads table', function () {
             }
         })
     })
-    it('Test active ads', function () {
+
+    it('Get ad details', function () {
+        cy.request(getAdsApi(`${this.data.API_BASE_URL}/admin/ads/?status=PENDING_VERIFICATION`)).then(res => {
+            for (let i = 0; i < res.body.items.length; i++) {
+                if (res.body.items[i].name == adToTest.name) {
+
+                    adToTest.id = res.body.items[i]._id
+                    cy.log(res.body.items[i].owner).adToTest_owner()
+                }
+            }
+        })
+
+        cy.log(adToTest.owner)
+    })
+
+    it('Ad preview', function () {
+        cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type(adToTest.name)
+        cy.wait(4000)
+        cy.get('.btn-group > :nth-child(1) > svg').click()
+    })
+    /* it('Test active ads', function () {
         cy.get('.css-yk16xz-control').click()
         cy.get('.css-11unzgr').contains('INACTIVE').click()
         cy.wait(20000)
@@ -98,7 +129,7 @@ describe('Test ads table', function () {
                 })
             }
         })
-    })
+    }) */
     /* it('Test search', function () {
         cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
         cy.get('tbody > tr').then($tableRows=>{
@@ -109,10 +140,6 @@ describe('Test ads table', function () {
             }
         })
     }) */
-    /* 
-    it('Ad preview', function () {
-        cy.get('.mg-b-10 > .card-body > :nth-child(2) > .col-lg-12 > .table-responsive > .dataTables_wrapper > .dataTables_filter > label > input').type('LielTest')
-        cy.wait(4000)
-        
-    }) */
+
+
 })

@@ -40,7 +40,7 @@ describe('Billing section', function () {
     })
 })
 
-/* describe('System daily billing',function(){
+ describe('System daily billing',function(){
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -136,7 +136,7 @@ describe('Billing section', function () {
         })
         cy.checkApiLoad(`${this.data.API_BASE_URL}/admin/billing/system/daily?date_start=${yesterday.format('YYYY-MM-DD')}&date_end=${thisMonth.format('YYYY-MM-DD')}`,Authorization)
     })
-}) */
+}) 
 
 
 describe('Accounts billing',function(){

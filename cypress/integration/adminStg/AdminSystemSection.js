@@ -87,7 +87,7 @@ describe('System section', function () {
 
 
 
-/* describe('Charts', function () {
+  describe('Charts', function () {
     beforeEach(function () {
         cy.fixture('example').then(function (data) {
             this.data = data
@@ -231,7 +231,7 @@ describe('Bidder status', function () {
     it('Test csv download', function () {
         let currentDate = dayjs()
         let yesterday = currentDate.subtract(1, 'days')
-        cy.get('.DataTable_exportButton__3uCk7').click()
+        cy.get('#nuviad-bidders-status-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
         cy.wait(12000)
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Bidders status.csv`)).should("exist");
@@ -266,8 +266,8 @@ describe('Bidder status', function () {
                                 })
                                 cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(8)`).then($qps=>{
                                     let qpsInTable=Number($qps.text())
-                                    let qpsInApi=Number(response.body.rows[i].qps)
-                                    expect(qpsInTable).to.eq(qpsInApi)
+                                    let qpsInApi=Number(response.body.rows[i].qps).toFixed(0)
+                                    expect(qpsInTable).to.eq(Number(qpsInApi))
                                 })
                                 cy.get('#nuviad-bidders-status-card').find(`tbody > :nth-child(${j}) > :nth-child(9)`).then($bids=>{
                                     let bidsInTable=Number($bids.text())
@@ -281,9 +281,9 @@ describe('Bidder status', function () {
             })
         })
     }) 
-}) */
+}) 
 
-/* describe('Detailed bidder view', function () {
+ describe('Detailed bidder view', function () {
     let bidderToTest = ''
     Cypress.Commands.add("bidderToTest", { prevSubject: true }, (value) => {
         bidderToTest = value
@@ -308,7 +308,8 @@ describe('Bidder status', function () {
         return apiToTest
     }
     it('Enter to the detailed bidder view', function () {
-        cy.get('tbody > :nth-child(1) > :nth-child(2)').invoke('text').bidderToTest()
+        cy.wait(10000)
+        cy.get('#nuviad-bidders-status-table > .dataTables_wrapper > .table > tbody > :nth-child(1) > :nth-child(2)').invoke('text').bidderToTest()
         cy.get(':nth-child(1) > :nth-child(10) > a').click({ force: true })
     })
     it('Verify that we are looking a the right instance details', function () {
@@ -340,7 +341,7 @@ describe('Bidder status', function () {
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Bidders instance ${bidderToTest} status.csv`)).should("exist");
     })
-}) */
+}) 
 
 describe('Servers status', function () {
     beforeEach(function () {
@@ -400,7 +401,7 @@ describe('Servers status', function () {
     it('Test csv download', function () {
         let currentDate = dayjs()
         let yesterday = currentDate.subtract(1, 'days')
-        cy.get('#nuviad-servers-status-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
+        cy.get('#nuviad-bidders-instance-status-table > .dataTables_wrapper > :nth-child(2) > .DataTable_exportButton__3uCk7').click()
         cy.wait(12000)
         const downloadsFolder = Cypress.config("downloadsFolder");
         cy.readFile(path.join(downloadsFolder, `Servers status.csv`)).should("exist");
